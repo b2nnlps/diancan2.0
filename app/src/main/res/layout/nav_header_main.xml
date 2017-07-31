@@ -30,6 +30,6 @@
         android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="容合天下，有容乃大" />
+        android:text="有容乃大，天地人和" />
 
 </LinearLayout>
