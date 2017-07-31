@@ -32,7 +32,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -63,9 +65,11 @@ public class MainActivity extends AppCompatActivity
     private MyBluetoothAdapter unboundAdapter;
     private String defaultDevice = "";
     private boolean isPrinter = false;
+    String userId, userName, userPassword, userText;
     //=================绑定控件====================
-    Button btnOpen, btnSearch, btnSetting;
+    Button btnOpen, btnSearch, btn_save;
     ListView lvUnboundDevice, lvBoundDevice;
+    EditText k_userId, k_userName, k_userPassword, k_userText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -333,14 +337,50 @@ public class MainActivity extends AppCompatActivity
         page_setting = findViewById(R.id.page_setting);
         page_printer = findViewById(R.id.page_printer);
         btnSearch = (Button) findViewById(R.id.btnSearch);
+        btn_save = (Button) findViewById(R.id.btn_save);
         lvBoundDevice = (ListView) findViewById(R.id.lv_bound_device);
         lvUnboundDevice = (ListView) findViewById(R.id.lv_unbound_device);
+        k_userId = (EditText) findViewById(R.id.userId);
+        k_userName = (EditText) findViewById(R.id.userName);
+        k_userPassword = (EditText) findViewById(R.id.userPassword);
+        k_userText = (EditText) findViewById(R.id.userText);
         btnSearch.setOnClickListener(new View.OnClickListener() {//搜索蓝牙设备
             @Override
             public void onClick(View v) {
                 pressTb();//没有打开蓝牙则打开蓝牙并搜索，打开则开始搜索
             }
         });
+        btn_save.setOnClickListener(new View.OnClickListener() {//搜索蓝牙设备
+            @Override
+            public void onClick(View v) {
+                getSetting();
+                if (k_userId.getText().toString().length() == 0 || k_userText.getText().toString().length() == 0) {
+                    Toast.makeText(MainActivity.this, "两项都必须要填写", Toast.LENGTH_LONG).show();
+                    return;
+                }
+                Toast.makeText(MainActivity.this, "保存成功！", Toast.LENGTH_LONG).show();
+                String str = k_userId.getText().toString() + "|" + k_userText.getText().toString();
+                writeFile("user.ng", str);
+                getSetting();
+            }
+        });
+        readSetting();
+    }
+
+    public void getSetting() {//获取商家设置
+        userId = k_userId.getText().toString();
+        userName = k_userName.getText().toString();
+        userPassword = k_userPassword.getText().toString();
+        userText = k_userText.getText().toString();
+    }
+
+    public void readSetting() {//读取商家设置
+        String str = readFile("user.ng");
+        if (str.length() > 1) {
+            String[] temp = str.split("\\|");
+            k_userId.setText(temp[0]);
+            k_userText.setText(temp[1]);
+        }
     }
 
     public void showPage(int page) {//切换界面
