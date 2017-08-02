@@ -21,6 +21,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -52,7 +53,7 @@ import java.util.UUID;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private View page_main, page_setting, page_printer, page_order;
+    private View page_main, page_setting, page_printer, page_chuguo, page_chuancai;
     //===============搜索蓝牙打印机================
     private BluetoothAdapter mBluetoothAdapter;
     private static final int REQUEST_ENABLE_BT = 1;
@@ -68,7 +69,7 @@ public class MainActivity extends AppCompatActivity
     private MyBluetoothAdapter unboundAdapter;
     private String defaultDevice = "";
     private boolean isPrinter = false;
-    String userId, userName, userPassword, userText;
+    String userId, userName, userPassword, userText, userHash;
     //=================绑定控件====================
     Button btnOpen, btnSearch, btn_save;
     ListView lvUnboundDevice, lvBoundDevice;
@@ -329,7 +330,7 @@ public class MainActivity extends AppCompatActivity
         page_main = findViewById(R.id.page_main);
         page_setting = findViewById(R.id.page_setting);
         page_printer = findViewById(R.id.page_printer);
-        page_order = findViewById(R.id.page_order);
+        page_chuguo = findViewById(R.id.page_order);
         btnSearch = (Button) findViewById(R.id.btnSearch);
         btn_save = (Button) findViewById(R.id.btn_save);
         lvBoundDevice = (ListView) findViewById(R.id.lv_bound_device);
@@ -348,22 +349,23 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 getSetting();
-                if (k_userId.getText().toString().length() == 0 || k_userText.getText().toString().length() == 0) {
-                    Toast.makeText(MainActivity.this, "两项都必须要填写", Toast.LENGTH_LONG).show();
+                if (userId.length() == 0 || userText.length() == 0 || userName.length() == 0 || userPassword.length() == 0) {
+                    Toast.makeText(MainActivity.this, "都必须要填写", Toast.LENGTH_LONG).show();
                     return;
                 }
-                Toast.makeText(MainActivity.this, "保存成功！", Toast.LENGTH_LONG).show();
-                String str = k_userId.getText().toString() + "|" + k_userText.getText().toString();
-                writeFile("user.ng", str);
                 getSetting();
+                String str = userId + "|" + userText + "|" + userName + "|" + userPassword;
+                writeFile("user.ng", str);//保存设置
+                userHash = ToastUtil.stringToMD5(userName + "llrj" + userPassword);
+                Toast.makeText(MainActivity.this, "保存成功！", Toast.LENGTH_LONG).show();
             }
         });
         readSetting();
         mWebView = (WebView) findViewById(R.id.webview);
         // 启用javascript
         mWebView.getSettings().setJavaScriptEnabled(true);
-        // 从assets目录下面的加载html
-        mWebView.loadUrl("file:///android_asset/ccdl.html");
+        mWebView.getSettings().setAllowFileAccess(true);
+        mWebView.getSettings().setMediaPlaybackRequiresUserGesture(false);
 
     }
 
@@ -380,6 +382,10 @@ public class MainActivity extends AppCompatActivity
             String[] temp = str.split("\\|");
             k_userId.setText(temp[0]);
             k_userText.setText(temp[1]);
+            k_userName.setText(temp[2]);
+            k_userPassword.setText(temp[3]);
+            getSetting();
+            userHash = ToastUtil.stringToMD5(userName + "llrj" + userPassword);
         }
     }
 
@@ -387,7 +393,7 @@ public class MainActivity extends AppCompatActivity
         page_setting.setVisibility(View.GONE);
         page_main.setVisibility(View.GONE);
         page_printer.setVisibility(View.GONE);
-        page_order.setVisibility(View.GONE);
+        page_chuguo.setVisibility(View.GONE);
         switch (page) {
             case 0://首页
                 page_main.setVisibility(View.VISIBLE);
@@ -399,9 +405,14 @@ public class MainActivity extends AppCompatActivity
                 page_printer.setVisibility(View.VISIBLE);
                 initView();
                 break;
-            case 3:
-                page_order.setVisibility(View.VISIBLE);
-                mWebView.loadUrl("javascript:actionFromNative()");
+            case 3://出锅界面
+                page_chuguo.setVisibility(View.VISIBLE);
+                System.out.println(userHash);
+                mWebView.loadUrl("file:///android_asset/cpdl.html?username=" + userName + "&hash=" + userHash);
+                break;
+            case 4://传菜界面
+                page_chuguo.setVisibility(View.VISIBLE);
+                mWebView.loadUrl("file:///android_asset/ccdl.html?username=" + userName + "&hash=" + userHash);
                 break;
         }
     }
@@ -457,7 +468,7 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_manage) {
             showPage(1);
         } else if (id == R.id.nav_share) {
-
+            showPage(4);
         } else if (id == R.id.nav_send) {
 
         }
