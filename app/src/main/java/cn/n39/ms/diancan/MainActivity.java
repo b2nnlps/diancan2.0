@@ -30,6 +30,9 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.JavascriptInterface;
+import android.webkit.WebSettings;
+import android.webkit.WebView;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
@@ -49,7 +52,7 @@ import java.util.UUID;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private View page_main, page_setting, page_printer;
+    private View page_main, page_setting, page_printer, page_order;
     //===============搜索蓝牙打印机================
     private BluetoothAdapter mBluetoothAdapter;
     private static final int REQUEST_ENABLE_BT = 1;
@@ -70,6 +73,7 @@ public class MainActivity extends AppCompatActivity
     Button btnOpen, btnSearch, btn_save;
     ListView lvUnboundDevice, lvBoundDevice;
     EditText k_userId, k_userName, k_userPassword, k_userText;
+    private WebView mWebView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,17 +81,6 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-//                View include = (View) findViewById(R.id.b);
-
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-//                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -336,6 +329,7 @@ public class MainActivity extends AppCompatActivity
         page_main = findViewById(R.id.page_main);
         page_setting = findViewById(R.id.page_setting);
         page_printer = findViewById(R.id.page_printer);
+        page_order = findViewById(R.id.page_order);
         btnSearch = (Button) findViewById(R.id.btnSearch);
         btn_save = (Button) findViewById(R.id.btn_save);
         lvBoundDevice = (ListView) findViewById(R.id.lv_bound_device);
@@ -365,6 +359,12 @@ public class MainActivity extends AppCompatActivity
             }
         });
         readSetting();
+        mWebView = (WebView) findViewById(R.id.webview);
+        // 启用javascript
+        mWebView.getSettings().setJavaScriptEnabled(true);
+        // 从assets目录下面的加载html
+        mWebView.loadUrl("file:///android_asset/ccdl.html");
+
     }
 
     public void getSetting() {//获取商家设置
@@ -387,6 +387,7 @@ public class MainActivity extends AppCompatActivity
         page_setting.setVisibility(View.GONE);
         page_main.setVisibility(View.GONE);
         page_printer.setVisibility(View.GONE);
+        page_order.setVisibility(View.GONE);
         switch (page) {
             case 0://首页
                 page_main.setVisibility(View.VISIBLE);
@@ -397,6 +398,10 @@ public class MainActivity extends AppCompatActivity
             case 2://打印机连接
                 page_printer.setVisibility(View.VISIBLE);
                 initView();
+                break;
+            case 3:
+                page_order.setVisibility(View.VISIBLE);
+                mWebView.loadUrl("javascript:actionFromNative()");
                 break;
         }
     }
@@ -446,7 +451,7 @@ public class MainActivity extends AppCompatActivity
         if (id == R.id.nav_camera) {
             showPage(0);
         } else if (id == R.id.nav_gallery) {
-
+            showPage(3);
         } else if (id == R.id.nav_printer) {
             showPage(2);
         } else if (id == R.id.nav_manage) {

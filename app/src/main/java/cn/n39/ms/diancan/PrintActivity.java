@@ -63,7 +63,7 @@ public class PrintActivity extends Service {
             switch (msg.what) {
                 case 0:
                     orderData = response.split("\\|");                    //0是订单号，1是打印的内容
-                    print(orderData[0], orderData[1] + userData[1]);
+                    print(orderData[0], orderData[1] + "\n" + userData[1]);
                     MediaPlayer player = MediaPlayer.create(PrintActivity.this, R.raw.dingdong);
                     player.start();
 

@@ -21,6 +21,13 @@
             app:popupTheme="@style/AppTheme.PopupOverlay" />
 
     </android.support.design.widget.AppBarLayout>
+    <!--<android.support.design.widget.FloatingActionButton-->
+    <!--android:id="@+id/fab"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="wrap_content"-->
+    <!--android:layout_gravity="bottom|end"-->
+    <!--android:layout_margin="@dimen/fab_margin"-->
+    <!--app:srcCompat="@android:drawable/ic_dialog_email" />-->
 
     <include
         android:id="@+id/page_main"
@@ -37,12 +44,10 @@
         layout="@layout/printer_connect"
         android:visibility="invisible" />
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
+    <include
+        android:id="@+id/page_order"
+        layout="@layout/order_view"
+        android:visibility="invisible" />
+
 
 </android.support.design.widget.CoordinatorLayout>

@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>容合点餐</title>
+    <link href="css/food.css" rel="stylesheet" type="text/css">
+    <link href="css/dxan.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<div class="box">
+    <div class="main">
+        <div class="Chika">
+            <div class="Chikafusa">
+                <a href="javascript:void(-1);" onClick="woaicssq(1)" id="woaicsstitle"
+                   class="thisclass">未出锅</a>
+                <a href="javascript:void(-1);" onClick="woaicssq(2)" id="woaicsstitle">已出锅</a>
+            </div>
+        </div>
+        <div id="woaicss_con1" style="display:block;">
+            <div id="wcg" class="cuisine_box">
+
+
+            </div>
+        </div>
+        <!---->
+        <div id="woaicss_con2" style="display:none;">
+            <div id="ycg" class="cuisine_box">
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
+<script src="js/jquery-1.8.3.min.js"></script>
+<script src="js/layer/layer.js"></script>
+<script src="js/api.js"></script>
+<script language="javascript">
+var index = layer.load(0, {shade: true}); //0代表加载的风格，支持0-2
+$(document).ready(function(){
+index = layer.load(0, {shade: false,time:1});
+	getOrder(0,0);
+	getOrder(0,1);
+	setInterval("getOrder(0,0)",15000)
+	setInterval("getOrder(0,1)",15000)
+});
+    function woaicssq(num){
+        for(var id = 1;id<=2;id++)
+        {
+            var MrJin="woaicss_con"+id;
+            if(id==num)
+                document.getElementById(MrJin).style.display="block";
+            else
+                document.getElementById(MrJin).style.display="none";
+        }
+        var zzsc = $(".Chikafusa a");
+        zzsc.click(function(){
+            $(this).addClass("thisclass").siblings().removeClass("thisclass");
+        });
+    }
+    $(function(){
+        var zzsc = $(".Chikafusa a");
+        zzsc.click(function(){
+            $(this).addClass("thisclass").siblings().removeClass("thisclass");
+        });
+    });
+
+</script>
