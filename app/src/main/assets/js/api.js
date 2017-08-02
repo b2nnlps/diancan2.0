@@ -58,12 +58,13 @@ function ccdl(res,status){
 			text+="</div>";
 			text+="</ul>";
 		}
-		if( res[i].status==2){//刷新菜品状态,如果订单状态已更新，但还存在视图，则删除
+		if(res[i].status==2){//如果已传菜，但还在未传菜，则删除
 			o=$("#dcc").find('#checkbox_d'+res[i].id).html();
 			if(o!=undefined){
 				setTimeout("hideChuanCaiOrder("+res[i].id+")",2000);//更新移动该元素
 			}
 		}
+		
 	}
 	if(newMess) {
 		if(status==1)
@@ -77,7 +78,7 @@ function ccdl(res,status){
 		firstOpen++;
 		newMess=false;
 }
-function cpdl(res,status){
+function cpdl(res,status){//出锅界面
 	var i,text="",len=res.length;
 	var o;
 	for(i=0;i<len;i++){
@@ -101,10 +102,16 @@ function cpdl(res,status){
 			if(status==1)
 				$("#ycg").append(text);	
 		}
-		if( res[i].status==1){//刷新菜品状态,如果订单状态已更新，但还存在视图，则删除
+		if( res[i].status==1){//如果已出锅，但还在未出锅里，则删除
 			o=$("#wcg").find('#checkbox_d'+res[i].id).html();
 			if(o!=undefined){
 				setTimeout("hideChuGuoOrder("+res[i].id+")",2000);//更新移动该元素
+			}
+		}
+		if( res[i].status==2){//如果已传菜，但还在已出锅里，则删除
+			o=$("#ycg").find('#checkbox_d'+res[i].id).html();
+			if(o!=undefined){
+				$("#checkbox_d"+res[i].id).parent().parent().remove();
 			}
 		}
 	}
@@ -122,6 +129,7 @@ function chuGuo(id){
 	var name=$("#checkbox_d"+id).parent().parent().find("em").html();
 	layer.confirm('<'+name+'>', {
 		title:'出锅确认',
+		closeBtn: 0,
 		btn: ['出锅','否'] //按钮
 }, function(){
     layer.msg('提交成功', {icon: 1});
@@ -146,7 +154,9 @@ function chuanCai(id){
 	var name=$("#checkbox_d"+id).parent().parent().find("span").html();
 	layer.confirm('<'+name+'>', {
 		title:'传菜确认',
+		closeBtn: 0,
 		btn: ['传菜','否'] //按钮
+		
 }, function(){
   layer.msg('提交成功', {icon: 1});
 	$("#checkbox_d"+id).attr('disabled','disabled');
@@ -198,29 +208,13 @@ var index = layer.load(0, {shade: false});
 
 function playSound()//播放提示音
     {
-      var borswer = window.navigator.userAgent.toLowerCase();
-      if ( borswer.indexOf( "ie" ) >= 0 )
-      {
-        //IE内核浏览器
-        var strEmbed = '<embed name="embedPlay" src="raw/dingdong.wav" autostart="true" hidden="true" loop="false"></embed>';
-        if ( $( "body" ).find( "embed" ).length <= 0 )
-          $( "body" ).append( strEmbed );
-        var embed = document.embedPlay;
-
-        //浏览器不支持 audion，则使用 embed 播放
-        embed.volume = 100;
-        //embed.play();这个不需要
-      } else
-      {
         //非IE内核浏览器
-        var strAudio = "<audio id='audioPlay' src='raw/dingdong.wav' hidden='true'>";
+        var strAudio = "<audio id='audioPlay' src='audio/dingdong.mp3' hidden='true'>";
         if ( $( "body" ).find( "audio" ).length <= 0 )
           $( "body" ).append( strAudio );
         var audio = document.getElementById( "audioPlay" );
-
         //浏览器支持 audion
         audio.play();
-      }
     }
 
 function getQueryString(name) { //获取get传过来的用户信息
