@@ -1,0 +1,192 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>容合点餐系统</title>
+    <link href="css/style.css" rel="stylesheet" type="text/css">
+</head>
+
+<body>
+<div class="box">
+    <div class="main">
+        <div class="seek_box">
+            <div class="seek clearfix">
+                <input type="text" placeholder="请输入您查询订单ID">
+                <a href="#"><img src="icon/ssimg.png"></a>
+            </div>
+        </div>
+        <div class="Chika">
+            <div class="Chikafusa">
+                <a href="#" onClick="woaicssq(1)" id="woaicsstitle" class="thisclass">进行中</a>
+                <a href="#" onClick="woaicssq(2)" id="woaicsstitle">已完成</a>
+            </div>
+        </div>
+        <div class="blank_box"></div>
+        <div id="woaicss_con1" style="display:block;">
+            <div class="indent" id="jxz">
+
+                <div class="load_more"><a>加载更多</a></div>
+                <div class="zw_box" id="jxtHint">
+                    <img src="images/zwjlimg.png">
+                    <p>暂无记录！</p>
+                </div>
+            </div>
+        </div>
+        <!---->
+        <div id="woaicss_con2" style="display:none;">
+            <div class="indent" id="ywc">
+
+            </div>
+            <div class="load_more"><a href="#">加载更多</a></div>
+            <div class="zw_box" id="ywcHint">
+                <img src="images/zwjlimg.png">
+                <p>暂无记录！</p>
+            </div>
+        </div>
+        <div class="details_box" id="detail">
+            <h4>订单详情</h4>
+            <div id="detail_info">
+                <dl class="clearfix">
+                    <dt>
+                    <h5>指留香烤鸭</h5><span>加辣椒</span></dt>
+                    <dd><span class="amount_box">X2</span><span class="price_box">￥68</span></dd>
+                </dl>
+            </div>
+
+
+            <div class="blank_box"></div>
+            <ul>
+                <li id="ddid"></li>
+                <li id="xdr"></li>
+                <li id="lxdh"></li>
+                <li id="jczh"></li>
+                <li id="ddzt"></li>
+                <li id="xdsj"></li>
+                <li id="bz"></li>
+            </ul>
+            <div class="submit_box1">
+                <button id="conf" onClick="">打印</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</body>
+</html>
+<script src="js/jquery-1.8.3.min.js"></script>
+<script src="js/layer/layer.js"></script>
+<script src="js/api.js"></script>
+<script language="javascript">
+var index = layer.load(0, {shade: true}); //0代表加载的风格，支持0-2
+    $(document).ready(function () {
+		layer.close(index);
+		getOrderList(1);
+		getOrderList(2);
+        setInterval("getOrderList(1)", 10000)
+        setInterval("getOrderList(2)", 10000)
+    });
+
+function showList(res,status){
+	var i, text = "", len = res.length;
+    var o;
+	if(len==0 && status==1) $("#jxtHint").show();
+	if(len==0 && status==2) $("#ywcHint").show();
+    for (i = 0; i < len; i++) {
+        if (orders.indexOf(res[i].id) == -1) {
+            orders.push(res[i].id);
+            newMess = true;
+			
+            text='<div id="ul'+res[i].id+'"><ul><li class="clearfix"><h4>订单ID：'+res[i].id+'</h4>';
+            text+='<span class="unpaid_box" style="color:#00A75A; border:1px solid #00A75A;" onClick="printOrder('+res[i].id+')">打印</span>';
+			text+='<span class="unpaid_box" style="color:#3C8DBD; border:1px solid #3C8DBD; margin:0 5px; " onClick="detail('+"'"+res[i].table+"',"+res[i].id+')">查看</span></li>';
+			text+='<li class="clearfix" style="border:none;margin-bottom:-10px;"><h4>桌号：'+res[i].table+'</h4><span class="consume_box">￥'+res[i].total+'</span></li>';
+			text+='<li class="clearfix"><h4 class="time_box">下单时间：'+res[i].created_time+'</h4><span style="color:#A0A3A5; font-size:14px;">'+res[i].people+'人就餐</span></li>';
+			text+='<div class="hint_box"><img src="images/tishi.png" width="15" height="15">'+res[i].text+'</div>';
+			text+='</ul><div class="blank_box"></div></div>';
+			
+            if (status == 1){
+				var html=$("#jxz").html();
+				$("#jxz").html(text+html);
+				$("#jxtHint").hide();
+			}
+               
+            if (status == 2) {
+				var html=$("#ywc").html();
+				$("#ywc").html(text+html);
+				$("#ywcHint").hide();
+			}
+        }
+        if (res[i].status == 2) {//如果已出锅，但还在未出锅里，则删除
+            o = $("#jxz").find('#ul' + res[i].id).html();
+            if (o != undefined) {
+                setTimeout("hideOrderList(" + res[i].id + ")", 2000);//更新移动该元素
+            }
+        }
+    }
+}
+
+function showDetail(res){
+	var order=res.order;
+	var detail=res.detail;
+	var i, text = "", len = detail.length;
+	$("#detail_info").html("");
+	for (i = 0; i < len; i++) {
+		text='<dl class="clearfix">';
+		text+='<dt><h5>'+detail[i].name+'</h5><span>'+detail[i].type+'</span></dt>';
+		text+='<dd><span class="amount_box">X'+detail[i].num+'</span><span class="price_box">￥'+detail[i].price+'</span></dd></dl>';
+		$("#detail_info").append(text);
+	}
+	$("#ddid").html("订单ID："+order.id);
+	$("#xdr").html("下单人："+order.realname);
+	$("#lxdh").html("联系电话："+order.phone);
+	$("#jczh").html("就餐桌号："+order.table);
+	if(order.status==2) status="已完成"; else status="进行中";
+	$("#ddzt").html("订单状态："+status);
+	$("#xdsj").html("下单时间："+order.created_time);
+	$("#bz").html("订单备注："+order.text);
+	$("#conf").attr("onClick",'printOrder('+order.id+")");
+}
+
+function hideOrderList(id) {
+    var parent = $("#ul" + id);
+    $(parent).slideUp(800, function () {
+        var html = $(parent).html() + $("#ywc").html();//转到隔壁
+        $("#ywc").html(html);
+        $(this).remove();
+    })
+}
+
+    function detail(table,orderId) {
+		getOrderDetail(orderId);
+        var index = layer.open({
+            type: 1,
+            title: "桌号："+table,
+			fixed:true,
+            content: $("#detail")
+        });
+        layer.full(index);
+    }
+    function woaicssq(num) {
+        for (var id = 1; id <= 2; id++) {
+            var MrJin = "woaicss_con" + id;
+            if (id == num)
+                document.getElementById(MrJin).style.display = "block";
+            else
+                document.getElementById(MrJin).style.display = "none";
+        }
+        var zzsc = $(".Chikafusa a");
+        zzsc.click(function () {
+            $(this).addClass("thisclass").siblings().removeClass("thisclass");
+        });
+    }
+    $(function () {
+        var zzsc = $(".Chikafusa a");
+        zzsc.click(function () {
+            $(this).addClass("thisclass").siblings().removeClass("thisclass");
+        });
+    });
+
+</script>

@@ -63,7 +63,11 @@ public class PrintActivity extends Service {
             switch (msg.what) {
                 case 0:
                     orderData = response.split("\\|");                    //0是订单号，1是打印的内容
-                    print(orderData[0], orderData[1] + "\n" + userData[1]);
+                    if (orderData.length == 1) {//如果是包重发，直接接着打印
+                        print("", orderData[0]);
+                    } else {
+                        print(orderData[0], orderData[1]);
+                    }
                     MediaPlayer player = MediaPlayer.create(PrintActivity.this, R.raw.dingdong);
                     player.start();
 
@@ -165,8 +169,12 @@ public class PrintActivity extends Service {
         if (TextUtils.isEmpty(sendData)) {
             return;
         }
-        no = "#" + no + "\n";
-        sendData = sendData + "\n\n\n";//3行回车正好
+        if (!no.equals(""))//如果不是续传
+            no = "#" + no + "\n";
+        int a = sendData.length();
+        String deng = sendData.substring(a - 1, a);
+        if (deng.equals("="))//如果结束了
+            sendData = sendData + "\n" + userData[1] + "\n\n\n";//3行回车正好
         int i;
         BluetoothSocket printer;
         for (i = 0; i < printers.size(); i++) {
@@ -174,13 +182,15 @@ public class PrintActivity extends Service {
             if (printer.isConnected()) {
                 try {
                     outputStream = printer.getOutputStream();
-                    byte[] print_no = no.getBytes("gbk");
                     byte[] print_data = sendData.getBytes("gbk");
-                    outputStream.write(CommandsUtil.BYTE_COMMANDS[4]);//加大字体
-                    outputStream.write(CommandsUtil.BYTE_COMMANDS[6]);//加粗打印订单号
-                    outputStream.write(print_no, 0, print_no.length);
-                    outputStream.write(CommandsUtil.BYTE_COMMANDS[3]);//变小字体
-                    outputStream.write(CommandsUtil.BYTE_COMMANDS[5]);//取消加粗
+                    if (!no.equals("")) {
+                        byte[] print_no = no.getBytes("gbk");
+                        outputStream.write(CommandsUtil.BYTE_COMMANDS[4]);//加大字体
+                        outputStream.write(CommandsUtil.BYTE_COMMANDS[6]);//加粗打印订单号
+                        outputStream.write(print_no, 0, print_no.length);
+                        outputStream.write(CommandsUtil.BYTE_COMMANDS[3]);//变小字体
+                        outputStream.write(CommandsUtil.BYTE_COMMANDS[5]);//取消加粗
+                    }
                     outputStream.write(print_data, 0, print_data.length);
                     outputStream.flush();
                 } catch (IOException e) {
@@ -213,7 +223,7 @@ public class PrintActivity extends Service {
                         ouput.flush();
 
                         TCPon = true;
-                        byte[] b = new byte[10000];
+                        byte[] b = new byte[65535];
                         while (true) {
                             int length = input.read(b);
                             String Msg = new String(b, 0, length, "gb2312");

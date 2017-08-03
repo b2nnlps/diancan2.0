@@ -1,89 +1,318 @@
 @charset "utf-8";
 /* CSS Document */
-* {margin: 0;padding: 0;}
+* {
+    margin: 0;
+    padding: 0;
+}
+
 ul, li {
-	list-style: none;
+    list-style: none;
 }
+
 .clear {
-	clear: both;
+    clear: both;
 }
+
 a {
-	text-decoration: none;
-	outline: none; color:#000;
+    text-decoration: none;
+    outline: none;
+    color: #000;
 }
+
 a:hover {
-	text-decoration: none;
-	outline: none;
+    text-decoration: none;
+    outline: none;
 }
+
 input, ins, img {
-	vertical-align: middle;
-	border:none;
+    vertical-align: middle;
+    border: none;
 }
+
 cite, em, i, b {
-	font-style: normal;
-	font-weight: normal;
+    font-style: normal;
+    font-weight: normal;
 }
+
 body {
-	font-family:"微软雅黑";
+    font-family: "微软雅黑";
 }
-textarea, button,select, input {
-	outline: none;
+
+textarea, button, select, input {
+    outline: none;
 }
+
 /*===(清除浮动：开始)=====*/
-.clearfix:after{ content:"."; display:block; width:0; height:0; clear:both; visibility:hidden; overflow:hidden;}
-.clearfix{ display:block;}
-.clearfix{ clear:both;zoom: 1;}
-.blank_box{ width:100%; background-color:#EDF1F1; height:10px; border-bottom:1px solid #DCE4E7; border-top:1px solid #DCE4E7;}
+.clearfix:after {
+    content: ".";
+    display: block;
+    width: 0;
+    height: 0;
+    clear: both;
+    visibility: hidden;
+    overflow: hidden;
+}
+
+.clearfix {
+    display: block;
+}
+
+.clearfix {
+    clear: both;
+    zoom: 1;
+}
+
+.blank_box {
+    width: 100%;
+    background-color: #EDF1F1;
+    height: 10px;
+    border-bottom: 1px solid #DCE4E7;
+    border-top: 1px solid #DCE4E7;
+}
+
 /*===(清除浮动：结束)=====*/
-.box{
-	max-width:640px;
-	min-width: 320px;
-	margin: auto;
-	}/* CSS Document */
-.main{ width:100%;margin-top:51px;}
-.blank{ background-color:#EDF1F1; width:100%; height:10px;}
+.box {
+    max-width: 640px;
+    min-width: 320px;
+    margin: auto;
+}
+
+/* CSS Document */
+.main {
+    width: 100%;
+    margin-top: 51px;
+}
+
+.blank {
+    background-color: #EDF1F1;
+    width: 100%;
+    height: 10px;
+}
+
 /*导航：开始*/
-.Favorites{width:100%; position:fixed; top:0; z-index:100000; max-width:640px;min-width: 320px;background:#FFF; border-bottom:1px solid #E0DFDF;}
-.Favorites ul{width:100%; line-height:50px;}
-.Favorites li{ float:left; width:13%; text-align:center; font-size:14px;}
-.Favorites .Font{font-size:14px;}
-.Favorites li a{color:#F32442;}
-.Favorites p{ float:left ; width:74%; text-align:center;color: #000; font-size:14px;overflow: hidden; white-space: nowrap;  text-overflow: ellipsis;  }
+.Favorites {
+    width: 100%;
+    position: fixed;
+    top: 0;
+    z-index: 100000;
+    max-width: 640px;
+    min-width: 320px;
+    background: #FFF;
+    border-bottom: 1px solid #E0DFDF;
+}
+
+.Favorites ul {
+    width: 100%;
+    line-height: 50px;
+}
+
+.Favorites li {
+    float: left;
+    width: 13%;
+    text-align: center;
+    font-size: 14px;
+}
+
+.Favorites .Font {
+    font-size: 14px;
+}
+
+.Favorites li a {
+    color: #F32442;
+}
+
+.Favorites p {
+    float: left;
+    width: 74%;
+    text-align: center;
+    color: #000;
+    font-size: 14px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
 /*导航：结束*/
-.show_text{ width:100%;}
-.show_text ul li{ padding:10px 2.5%; font-size:14px; border-bottom:1px solid #EDEDED;}
-.compile_box{ width:100%;}
-.compile_box dl{ padding:5px 2.5%; border-bottom:1px solid #EDEDED;}
-.compile_box dl dt{ width:75px; font-size:14px;float:left; line-height:30px;}
-.compile_box dl dd{ width:75%;  float:left;}
-.compile_box dl dd input{ width:100%; border:none; }
-.compile_box dl dd textarea{ width:100%; line-height:20px; text-indent:5px; border:none; }
-.compile_box dl dd select{ width:31%; height:25px; line-height:25px; margin-right:5px; border:none; border-radius:5px;}
+.show_text {
+    width: 100%;
+}
+
+.show_text ul li {
+    padding: 10px 2.5%;
+    font-size: 14px;
+    border-bottom: 1px solid #EDEDED;
+}
+
+.compile_box {
+    width: 100%;
+}
+
+.compile_box dl {
+    padding: 5px 2.5%;
+    border-bottom: 1px solid #EDEDED;
+}
+
+.compile_box dl dt {
+    width: 75px;
+    font-size: 14px;
+    float: left;
+    line-height: 30px;
+}
+
+.compile_box dl dd {
+    width: 75%;
+    float: left;
+}
+
+.compile_box dl dd input {
+    width: 100%;
+    border: none;
+}
+
+.compile_box dl dd textarea {
+    width: 100%;
+    line-height: 20px;
+    text-indent: 5px;
+    border: none;
+}
+
+.compile_box dl dd select {
+    width: 31%;
+    height: 25px;
+    line-height: 25px;
+    margin-right: 5px;
+    border: none;
+    border-radius: 5px;
+}
+
 /**时间**/
-.timebox{}
-.timebox label{ font-size:14px; }
-.timebox input{ width:75%; border:none; }
+.timebox {
+}
 
-.standard_box{ width:100%;}
-.standard_top dl{ padding:5px 2.5%; border-bottom:1px solid #EDEDED;}
-.standard_top dl dt{ width:75px; font-size:14px;float:left; line-height:30px;}
-.standard_top dl dd{ width:75%;  float:left;}
-.standard_top dl dd input{ width:100%; border: none;}
+.timebox label {
+    font-size: 14px;
+}
 
-.standard_centre{ width:90%; margin:5px 0; border:1px solid #EDEDED; border-left:none; position:relative;}
-.standard_centre dl{ padding:3px 0 3px 2.5%; border-bottom:1px solid #EDEDED;}
-.standard_centre dl dt{ width:75px; font-size:14px;float:left; line-height:25px;}
-.standard_centre dl dd{ width:66%;  float:left;}
-.standard_centre dl dd input{ width:100%; border:none;}
+.timebox input {
+    width: 75%;
+    border: none;
+}
 
-.delete_box{ width:20px; height:20px; background-color:#FFF;position:absolute; top:39px; right:-10px; border-radius:100px;}
-.delete_box img{ width:20px; height:20px;}
-.add_box{ width:100%; text-align:center; padding:5px 0; font-size:14px; border-bottom:1px solid #EDEDED;border-top:1px solid #EDEDED; }
-.add_box img{ width:20px; height:20px; padding:0 5px; font-size:14px;}
+.standard_box {
+    width: 100%;
+}
+
+.standard_top dl {
+    padding: 5px 2.5%;
+    border-bottom: 1px solid #EDEDED;
+}
+
+.standard_top dl dt {
+    width: 75px;
+    font-size: 14px;
+    float: left;
+    line-height: 30px;
+}
+
+.standard_top dl dd {
+    width: 75%;
+    float: left;
+}
+
+.standard_top dl dd input {
+    width: 100%;
+    border: none;
+}
+
+.standard_centre {
+    width: 90%;
+    margin: 5px 0;
+    border: 1px solid #EDEDED;
+    border-left: none;
+    position: relative;
+}
+
+.standard_centre dl {
+    padding: 3px 0 3px 2.5%;
+    border-bottom: 1px solid #EDEDED;
+}
+
+.standard_centre dl dt {
+    width: 75px;
+    font-size: 14px;
+    float: left;
+    line-height: 25px;
+}
+
+.standard_centre dl dd {
+    width: 66%;
+    float: left;
+}
+
+.standard_centre dl dd input {
+    width: 100%;
+    border: none;
+}
+
+.delete_box {
+    width: 20px;
+    height: 20px;
+    background-color: #FFF;
+    position: absolute;
+    top: 39px;
+    right: -10px;
+    border-radius: 100px;
+}
+
+.delete_box img {
+    width: 20px;
+    height: 20px;
+}
+
+.add_box {
+    width: 100%;
+    text-align: center;
+    padding: 5px 0;
+    font-size: 14px;
+    border-bottom: 1px solid #EDEDED;
+    border-top: 1px solid #EDEDED;
+}
+
+.add_box img {
+    width: 20px;
+    height: 20px;
+    padding: 0 5px;
+    font-size: 14px;
+}
 
 /****/
-.button_box{ }
-.button_box li{ float:left; width:50%;}
-.button_box li input{ width:100px; display:block; margin:10px auto; font-size:16px; background-color:#FF8854; color:#FFF; border:none;}
-.button_box ol{}
-.button_box ol input{ width:100px; display:block; margin:10px auto; font-size:16px; background-color:#FF8854; color:#FFF; border:none;}
+.button_box {
+}
+
+.button_box li {
+    float: left;
+    width: 50%;
+}
+
+.button_box li input {
+    width: 100px;
+    display: block;
+    margin: 10px auto;
+    font-size: 16px;
+    background-color: #FF8854;
+    color: #FFF;
+    border: none;
+}
+
+.button_box ol {
+}
+
+.button_box ol input {
+    width: 100px;
+    display: block;
+    margin: 10px auto;
+    font-size: 16px;
+    background-color: #FF8854;
+    color: #FFF;
+    border: none;
+}

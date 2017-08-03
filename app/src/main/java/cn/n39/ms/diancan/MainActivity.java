@@ -53,7 +53,7 @@ import java.util.UUID;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private View page_main, page_setting, page_printer, page_chuguo, page_chuancai;
+    private View page_main, page_setting, page_printer, page_web;
     //===============搜索蓝牙打印机================
     private BluetoothAdapter mBluetoothAdapter;
     private static final int REQUEST_ENABLE_BT = 1;
@@ -330,7 +330,7 @@ public class MainActivity extends AppCompatActivity
         page_main = findViewById(R.id.page_main);
         page_setting = findViewById(R.id.page_setting);
         page_printer = findViewById(R.id.page_printer);
-        page_chuguo = findViewById(R.id.page_order);
+        page_web = findViewById(R.id.page_order);
         btnSearch = (Button) findViewById(R.id.btnSearch);
         btn_save = (Button) findViewById(R.id.btn_save);
         lvBoundDevice = (ListView) findViewById(R.id.lv_bound_device);
@@ -393,26 +393,29 @@ public class MainActivity extends AppCompatActivity
         page_setting.setVisibility(View.GONE);
         page_main.setVisibility(View.GONE);
         page_printer.setVisibility(View.GONE);
-        page_chuguo.setVisibility(View.GONE);
+        page_web.setVisibility(View.GONE);
         switch (page) {
             case 0://首页
                 page_main.setVisibility(View.VISIBLE);
                 break;
-            case 1://商家设置
-                page_setting.setVisibility(View.VISIBLE);
+            case 1://订单界面
+                page_web.setVisibility(View.VISIBLE);
+                mWebView.loadUrl("file:///android_asset/order-list.html?username=" + userName + "&hash=" + userHash);
                 break;
-            case 2://打印机连接
+            case 2://出锅界面
+                page_web.setVisibility(View.VISIBLE);
+                mWebView.loadUrl("file:///android_asset/cpdl.html?username=" + userName + "&hash=" + userHash);
+                break;
+            case 3://传菜界面
+                page_web.setVisibility(View.VISIBLE);
+                mWebView.loadUrl("file:///android_asset/ccdl.html?username=" + userName + "&hash=" + userHash);
+                break;
+            case 4://打印机连接
                 page_printer.setVisibility(View.VISIBLE);
                 initView();
                 break;
-            case 3://出锅界面
-                page_chuguo.setVisibility(View.VISIBLE);
-                System.out.println(userHash);
-                mWebView.loadUrl("file:///android_asset/cpdl.html?username=" + userName + "&hash=" + userHash);
-                break;
-            case 4://传菜界面
-                page_chuguo.setVisibility(View.VISIBLE);
-                mWebView.loadUrl("file:///android_asset/ccdl.html?username=" + userName + "&hash=" + userHash);
+            case 5://商家设置
+                page_setting.setVisibility(View.VISIBLE);
                 break;
         }
     }
@@ -459,18 +462,18 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.nav_index) {
             showPage(0);
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_order) {
+            showPage(1);
+        } else if (id == R.id.nav_kitchen) {
+            showPage(2);
+        } else if (id == R.id.nav_deviler) {
             showPage(3);
         } else if (id == R.id.nav_printer) {
-            showPage(2);
-        } else if (id == R.id.nav_manage) {
-            showPage(1);
-        } else if (id == R.id.nav_share) {
             showPage(4);
-        } else if (id == R.id.nav_send) {
-
+        } else if (id == R.id.nav_manager) {
+            showPage(5);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);

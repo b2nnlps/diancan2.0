@@ -117,58 +117,57 @@
                         <li><input style=" background-color:#FE4543; "type="submit" value="保存"></li>
                      </ul>-->
                     <ol><input type="submit" value="提交"></ol>
+                </div>
             </div>
-        </div>
         </div>
     </div>
 </div>
 </body>
 </html>
 <script language="javascript">
-	i = 1;
-	document.getElementById("sub").onclick=function(){
-	//alert(i)
-	  document.getElementById("gg_box").innerHTML+='<div class="standard_centre" id="gg_box_'+i+'">  <dl class="clearfix"><dt>规格'+i+'：</dt><dd><input  placeholder="可输入颜色，大小，尺寸" type="text" value="" ></dd></dl><dl class="clearfix"><dt>价格：</dt><dd><input placeholder="零售价格" type="text" ></dd></dl><dl class="clearfix"><dt>库存：</dt><dd><input placeholder="真实库存" type="text" ></dd></dl><div class="delete_box" onclick="del('+i+')"><img src="icon/scimg.png"></div></div>';
-	  if(i==1){
-		document.getElementById("gg_box").removeChild(document.getElementById("one"));
-	  }
-	    i = i + 1;
-	  
-	}
-	function del(o){
-		 document.getElementById("gg_box").removeChild(document.getElementById("gg_box_"+o));
-		 
-		 var number = document.getElementById("gg_box").getElementsByTagName("div").length ;
-		if(number==0){
-			document.getElementById("gg_box").innerHTML+='<div class="standard_top" id="one"><dl class="clearfix"><dt>价格：</dt><dd><input placeholder="输入价格" type="text" ></dd></dl><dl class="clearfix"><dt>库存：</dt><dd><input placeholder="输入库存" type="text" ></dd></dl></div>';
-			i =1;
-		}
-	}
+    i = 1;
+    document.getElementById("sub").onclick = function () {
+        //alert(i)
+        document.getElementById("gg_box").innerHTML += '<div class="standard_centre" id="gg_box_' + i + '">  <dl class="clearfix"><dt>规格' + i + '：</dt><dd><input  placeholder="可输入颜色，大小，尺寸" type="text" value="" ></dd></dl><dl class="clearfix"><dt>价格：</dt><dd><input placeholder="零售价格" type="text" ></dd></dl><dl class="clearfix"><dt>库存：</dt><dd><input placeholder="真实库存" type="text" ></dd></dl><div class="delete_box" onclick="del(' + i + ')"><img src="icon/scimg.png"></div></div>';
+        if (i == 1) {
+            document.getElementById("gg_box").removeChild(document.getElementById("one"));
+        }
+        i = i + 1;
+
+    }
+    function del(o) {
+        document.getElementById("gg_box").removeChild(document.getElementById("gg_box_" + o));
+
+        var number = document.getElementById("gg_box").getElementsByTagName("div").length;
+        if (number == 0) {
+            document.getElementById("gg_box").innerHTML += '<div class="standard_top" id="one"><dl class="clearfix"><dt>价格：</dt><dd><input placeholder="输入价格" type="text" ></dd></dl><dl class="clearfix"><dt>库存：</dt><dd><input placeholder="输入库存" type="text" ></dd></dl></div>';
+            i = 1;
+        }
+    }
 </script>
 <script type="text/javascript">
-        $(function () {
-			var currYear = (new Date()).getFullYear();	
-			var opt={};
-			opt.date = {preset : 'date'};
-			opt.datetime = {preset : 'datetime'};
-			opt.time = {preset : 'time'};
-			opt.default = {
-				theme: 'android-ics light', //皮肤样式
-		        display: 'modal', //显示方式 
-		        mode: 'scroller', //日期选择模式
-				dateFormat: 'yyyy-mm-dd',
-				lang: 'zh',
-				showNow: true,
-				nowText: "今天",
-		        startYear: currYear - 10, //开始年份
-		        endYear: currYear + 10 //结束年份
-			};
+    $(function () {
+        var currYear = (new Date()).getFullYear();
+        var opt = {};
+        opt.date = {preset: 'date'};
+        opt.datetime = {preset: 'datetime'};
+        opt.time = {preset: 'time'};
+        opt.default = {
+            theme: 'android-ics light', //皮肤样式
+            display: 'modal', //显示方式
+            mode: 'scroller', //日期选择模式
+            dateFormat: 'yyyy-mm-dd',
+            lang: 'zh',
+            showNow: true,
+            nowText: "今天",
+            startYear: currYear - 10, //开始年份
+            endYear: currYear + 10 //结束年份
+        };
 
-		  	$("#appDate").mobiscroll($.extend(opt['date'], opt['default']));
-		  	var optDateTime = $.extend(opt['datetime'], opt['default']);
-		  	var optTime = $.extend(opt['time'], opt['default']);
-		    $("#appDateTime").mobiscroll(optDateTime).datetime(optDateTime);
-		    $("#appTime").mobiscroll(optTime).time(optTime);
-        });
-
+        $("#appDate").mobiscroll($.extend(opt['date'], opt['default']));
+        var optDateTime = $.extend(opt['datetime'], opt['default']);
+        var optTime = $.extend(opt['time'], opt['default']);
+        $("#appDateTime").mobiscroll(optDateTime).datetime(optDateTime);
+        $("#appTime").mobiscroll(optTime).time(optTime);
+    });
 </script>
