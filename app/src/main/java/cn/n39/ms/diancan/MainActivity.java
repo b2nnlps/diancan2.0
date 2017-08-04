@@ -74,20 +74,15 @@ public class MainActivity extends AppCompatActivity
     Button btnOpen, btnSearch, btn_save;
     ListView lvUnboundDevice, lvBoundDevice;
     EditText k_userId, k_userName, k_userPassword, k_userText;
+    Toolbar toolbar;
     private WebView mWebView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        changeTitle(R.drawable.ic_index_white, this.getString(R.string.app_name));
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -389,6 +384,18 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public void changeTitle(int Resid, String title) {//改变APP的标题
+        if (Resid != 0)
+            toolbar.setLogo(Resid);//LOGO
+        toolbar.setTitle(title);
+        setSupportActionBar(toolbar);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+    }
+
     public void showPage(int page) {//切换界面
         page_setting.setVisibility(View.GONE);
         page_main.setVisibility(View.GONE);
@@ -397,25 +404,31 @@ public class MainActivity extends AppCompatActivity
         switch (page) {
             case 0://首页
                 page_main.setVisibility(View.VISIBLE);
+                changeTitle(R.drawable.ic_index_white, "首页");
                 break;
-            case 1://订单界面
+            case 1://订单查看
                 page_web.setVisibility(View.VISIBLE);
                 mWebView.loadUrl("file:///android_asset/order-list.html?username=" + userName + "&hash=" + userHash);
+                changeTitle(R.drawable.ic_order_white, "订单查看");
                 break;
-            case 2://出锅界面
+            case 2://厨房订单
                 page_web.setVisibility(View.VISIBLE);
                 mWebView.loadUrl("file:///android_asset/cpdl.html?username=" + userName + "&hash=" + userHash);
+                changeTitle(R.drawable.ic_kitchen_white, "厨房订单");
                 break;
-            case 3://传菜界面
+            case 3://传菜订单
                 page_web.setVisibility(View.VISIBLE);
                 mWebView.loadUrl("file:///android_asset/ccdl.html?username=" + userName + "&hash=" + userHash);
+                changeTitle(R.drawable.ic_chuancai_white, "传菜订单");
                 break;
             case 4://打印机连接
                 page_printer.setVisibility(View.VISIBLE);
                 initView();
+                changeTitle(R.drawable.ic_printer_white, "打印机连接");
                 break;
             case 5://商家设置
                 page_setting.setVisibility(View.VISIBLE);
+                changeTitle(R.drawable.ic_setting_white, "商家设置");
                 break;
         }
     }
@@ -426,11 +439,9 @@ public class MainActivity extends AppCompatActivity
             DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
             if (drawer.isDrawerOpen(GravityCompat.START)) {
                 drawer.closeDrawer(GravityCompat.START);
-            } else {
-                super.onBackPressed();
             }
         } finally {
-
+            moveTaskToBack(true);
         }
     }
 
@@ -484,8 +495,11 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        try {
+            unregisterReceiver(deviceReceiver);
+        } catch (Exception e) {
 
-        unregisterReceiver(deviceReceiver);
+        }
     }
 
     private void defaultData() {//获取默认设备
