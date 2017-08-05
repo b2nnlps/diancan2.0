@@ -47,6 +47,7 @@
         </div>
         <div class="details_box" id="detail">
             <h4>订单详情</h4>
+
             <div id="detail_info">
                 <dl class="clearfix">
                     <dt>
@@ -80,91 +81,95 @@
 <script src="js/layer/layer.js"></script>
 <script src="js/api.js"></script>
 <script language="javascript">
-var index = layer.load(0, {shade: true}); //0代表加载的风格，支持0-2
-    $(document).ready(function () {
-		layer.close(index);
-		getOrderList(1);
-		getOrderList(2);
+    var index; //0代表加载的风格，支持0-2
+    layer.ready(function () {
+        index = layer.load(0, {shade: false});
+        getOrderList(1);
+        getOrderList(2);
         setInterval("getOrderList(1)", 10000)
         setInterval("getOrderList(2)", 10000)
     });
 
-function showList(res,status){
-	var i, text = "", len = res.length;
-    var o;
-	if(len==0 && status==1) $("#jxtHint").show();
-	if(len==0 && status==2) $("#ywcHint").show();
-    for (i = 0; i < len; i++) {
-        if (orders.indexOf(res[i].id) == -1) {
-            orders.push(res[i].id);
-            newMess = true;
-			
-            text='<div id="ul'+res[i].id+'"><ul><li class="clearfix"><h4>订单ID：'+res[i].id+'</h4>';
-            text+='<span class="unpaid_box" style="color:#00A75A; border:1px solid #00A75A;" onClick="printOrder('+res[i].id+')">打印</span>';
-			text+='<span class="unpaid_box" style="color:#3C8DBD; border:1px solid #3C8DBD; margin:0 5px; " onClick="detail('+"'"+res[i].table+"',"+res[i].id+')">查看</span></li>';
-			text+='<li class="clearfix" style="border:none;margin-bottom:-10px;"><h4>桌号：'+res[i].table+'</h4><span class="consume_box">￥'+res[i].total+'</span></li>';
-			text+='<li class="clearfix"><h4 class="time_box">下单时间：'+res[i].created_time+'</h4><span style="color:#A0A3A5; font-size:14px;">'+res[i].people+'人就餐</span></li>';
-			text+='<div class="hint_box"><img src="images/tishi.png" width="15" height="15">'+res[i].text+'</div>';
-			text+='</ul><div class="blank_box"></div></div>';
-			
-            if (status == 1){
-				var html=$("#jxz").html();
-				$("#jxz").html(text+html);
-				$("#jxtHint").hide();
-			}
-               
-            if (status == 2) {
-				var html=$("#ywc").html();
-				$("#ywc").html(text+html);
-				$("#ywcHint").hide();
-			}
-        }
-        if (res[i].status == 2) {//如果已出锅，但还在未出锅里，则删除
-            o = $("#jxz").find('#ul' + res[i].id).html();
-            if (o != undefined) {
-                setTimeout("hideOrderList(" + res[i].id + ")", 2000);//更新移动该元素
+    function showList(res, status) {
+        var i, text = "", len = res.length;
+        var o;
+        if (len == 0 && status == 1) $("#jxtHint").show();
+        if (len == 0 && status == 2) $("#ywcHint").show();
+        for (i = 0; i < len; i++) {
+            if (orders.indexOf(res[i].id) == -1) {
+                orders.push(res[i].id);
+                newMess = true;
+
+                text = '<div id="ul' + res[i].id + '"><ul><li class="clearfix"><h4>订单ID：' + res[i].id + '</h4>';
+                text += '<span class="unpaid_box" style="color:#00A75A; border:1px solid #00A75A;" onClick="printOrder(' + res[i].id + ')">打印</span>';
+                text += '<span class="unpaid_box" style="color:#3C8DBD; border:1px solid #3C8DBD; margin:0 5px; " onClick="detail(' + "'" + res[i].table + "'," + res[i].id + ')">查看</span></li>';
+                text += '<li class="clearfix" style="border:none;margin-bottom:-10px;"><h4>桌号：' + res[i].table + '</h4><span class="consume_box">￥' + res[i].total + '</span></li>';
+                text += '<li class="clearfix"><h4 class="time_box">下单时间：' + res[i].created_time + '</h4><span style="color:#A0A3A5; font-size:14px;">' + res[i].people + '人就餐</span></li>';
+                if ((res[i].text).length > 0)
+                    text += '<div class="hint_box"><img src="images/tishi.png" width="15" height="15"/>' + res[i].text + '</div>';
+                text += '</ul><div class="blank_box"></div></div>';
+
+                if (status == 1) {
+                    var html = $("#jxz").html();
+                    $("#jxz").html(text + html);
+                    $("#jxtHint").hide();
+                }
+
+                if (status == 2) {
+                    var html = $("#ywc").html();
+                    $("#ywc").html(text + html);
+                    $("#ywcHint").hide();
+                }
+            }
+            if (res[i].status == 2) {//如果已出锅，但还在未出锅里，则删除
+                o = $("#jxz").find('#ul' + res[i].id).html();
+                if (o != undefined) {
+                    setTimeout("hideOrderList(" + res[i].id + ")", 2000);//更新移动该元素
+                }
             }
         }
+        layer.close(index);
     }
-}
 
-function showDetail(res){
-	var order=res.order;
-	var detail=res.detail;
-	var i, text = "", len = detail.length;
-	$("#detail_info").html("");
-	for (i = 0; i < len; i++) {
-		text='<dl class="clearfix">';
-		text+='<dt><h5>'+detail[i].name+'</h5><span>'+detail[i].type+'</span></dt>';
-		text+='<dd><span class="amount_box">X'+detail[i].num+'</span><span class="price_box">￥'+detail[i].price+'</span></dd></dl>';
-		$("#detail_info").append(text);
-	}
-	$("#ddid").html("订单ID："+order.id);
-	$("#xdr").html("下单人："+order.realname);
-	$("#lxdh").html("联系电话："+order.phone);
-	$("#jczh").html("就餐桌号："+order.table);
-	if(order.status==2) status="已完成"; else status="进行中";
-	$("#ddzt").html("订单状态："+status);
-	$("#xdsj").html("下单时间："+order.created_time);
-	$("#bz").html("订单备注："+order.text);
-	$("#conf").attr("onClick",'printOrder('+order.id+")");
-}
+    function showDetail(res) {
+        var order = res.order;
+        var detail = res.detail;
+        var i, text = "", len = detail.length;
+        $("#detail_info").html("");
+        for (i = 0; i < len; i++) {
+            text = '<dl class="clearfix">';
+            text += '<dt><h5>' + detail[i].name + '</h5>';
+			if((detail[i].type)!=null)
+				text += '<span>' + detail[i].type + '</span>';
+            text += '</dt><dd><span class="amount_box">X' + detail[i].num + '</span><span class="price_box">￥' + (detail[i].price / 100) + '</span></dd></dl>';
+            $("#detail_info").append(text);
+        }
+        $("#ddid").html("订单ID：" + order.id);
+        $("#xdr").html("下单人：" + order.realname);
+        $("#lxdh").html("联系电话：" + order.phone);
+        $("#jczh").html("就餐桌号：" + order.table);
+        if (order.status == 2) status = "已完成"; else status = "进行中";
+        $("#ddzt").html("订单状态：" + status);
+        $("#xdsj").html("下单时间：" + order.created_time);
+        $("#bz").html("订单备注：" + order.text);
+        $("#conf").attr("onClick", 'printOrder(' + order.id + ")");
+    }
 
-function hideOrderList(id) {
-    var parent = $("#ul" + id);
-    $(parent).slideUp(800, function () {
-        var html = $(parent).html() + $("#ywc").html();//转到隔壁
-        $("#ywc").html(html);
-        $(this).remove();
-    })
-}
+    function hideOrderList(id) {
+        var parent = $("#ul" + id);
+        $(parent).slideUp(800, function () {
+            var html = $(parent).html() + $("#ywc").html();//转到隔壁
+            $("#ywc").html(html);
+            $(this).remove();
+        })
+    }
 
-    function detail(table,orderId) {
-		getOrderDetail(orderId);
+    function detail(table, orderId) {
+        getOrderDetail(orderId);
         var index = layer.open({
             type: 1,
-            title: "桌号："+table,
-			fixed:true,
+            title: "桌号：" + table,
+            fixed: true,
             content: $("#detail")
         });
         layer.full(index);
@@ -188,5 +193,4 @@ function hideOrderList(id) {
             $(this).addClass("thisclass").siblings().removeClass("thisclass");
         });
     });
-
 </script>

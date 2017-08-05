@@ -164,7 +164,7 @@ textarea, button, select, input {
 
 /**暂无记录**/
 .zw_box {
-	display:none;
+    display: none;
     padding: 10px 0;
 }
 
@@ -278,7 +278,7 @@ textarea, button, select, input {
 /**详情页面**/
 .details_box {
     width: 100%;
-	display:none;
+    display: none;
 }
 
 .details_box h4 {

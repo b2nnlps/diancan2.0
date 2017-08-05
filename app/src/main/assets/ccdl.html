@@ -40,9 +40,9 @@
 <script src="js/api.js"></script>
 
 <script language="javascript">
-    var index = layer.load(0, {shade: true}); //0代表加载的风格，支持0-2
-    $(document).ready(function () {
-        layer.close(index);
+    var index; //0代表加载的风格，支持0-2
+    layer.ready(function () {
+        index = layer.load(0, {shade: false});
         getOrder(1, 1);
         getOrder(1, 2);
         setInterval("getOrder(1,1)", 10000)
