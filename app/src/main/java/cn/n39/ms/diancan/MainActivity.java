@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity
     private static final int REQUEST_ENABLE_BT = 1;
     private static final int REQUEST_FINE_LOCATION = 0;
     public static final String DEVICE = "device", CMD = "cmd";
+    private static MainActivity instance;
     private ArrayList<BluetoothDevice> unbondDevicesList = new ArrayList<>();
     private ArrayList<BluetoothDevice> bondDevicesList = new ArrayList<>();
     private DeviceReceiver deviceReceiver;
@@ -85,10 +86,15 @@ public class MainActivity extends AppCompatActivity
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         changeTitle(R.drawable.ic_index_white, this.getString(R.string.app_name));
 
+
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);   //保持屏幕常亮
+
+        instance = this;    //用于弹窗依赖
+        checkUpdate();//检测更新
         initPage();
+
     }
 
     private void initView() {//初始化搜索蓝牙打印机相关
@@ -526,6 +532,22 @@ public class MainActivity extends AppCompatActivity
         defaultDevice = readFile(fileName);
     }
 
+    public void checkUpdate() {//检测更新，防卡
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {//新线程开启新服务，在服务里面开线程请求HTTP，分割HTTP信息，获取是不是最新，下载最新
+                //启动服务*/
+                Intent service = new Intent(MainActivity.this, UpdataService.class);
+                startService(service);
+            }
+        }).start();
+
+    }
+
+    public static Context getMyApplication() {
+        return instance;
+    }
     public String readFile(String fileName) {
         String res = "";
         try {
