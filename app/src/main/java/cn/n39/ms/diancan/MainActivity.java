@@ -59,7 +59,7 @@ public class MainActivity extends AppCompatActivity
     private BluetoothAdapter mBluetoothAdapter;
     private static final int REQUEST_ENABLE_BT = 1;
     private static final int REQUEST_FINE_LOCATION = 0;
-    public static final String DEVICE = "device";
+    public static final String DEVICE = "device", CMD = "cmd";
     private ArrayList<BluetoothDevice> unbondDevicesList = new ArrayList<>();
     private ArrayList<BluetoothDevice> bondDevicesList = new ArrayList<>();
     private DeviceReceiver deviceReceiver;
@@ -118,6 +118,7 @@ public class MainActivity extends AppCompatActivity
                 BluetoothDevice device = bondDevicesList.get(arg2);
                 Intent intent = new Intent(MainActivity.this, PrintActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+                intent.putExtra(CMD, "connect");
                 intent.putExtra(DEVICE, device);
                 startService(intent);
                 ToastUtil.showToast(MainActivity.this, "正在连接打印机...");
@@ -336,6 +337,9 @@ public class MainActivity extends AppCompatActivity
         k_userName = (EditText) findViewById(R.id.userName);
         k_userPassword = (EditText) findViewById(R.id.userPassword);
         k_userText = (EditText) findViewById(R.id.userText);
+        //单行输入
+        k_userName.setSingleLine(true);
+        k_userDeviceId.setSingleLine(true);
         btnSearch.setOnClickListener(new View.OnClickListener() {//搜索蓝牙设备
             @Override
             public void onClick(View v) {
@@ -357,6 +361,12 @@ public class MainActivity extends AppCompatActivity
                 writeFile("user.ng", str);//保存设置
                 userHash = ToastUtil.stringToMD5(userName + "llrj" + userPassword);
                 Toast.makeText(MainActivity.this, "保存成功！", Toast.LENGTH_LONG).show();
+                //重置连接
+                Intent intent = new Intent(MainActivity.this, PrintActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+
+                intent.putExtra(CMD, "reConnect");
+                startService(intent);
             }
         });
         readSetting();
@@ -369,20 +379,20 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void getSetting() {//获取商家设置
-        userDeviceId = k_userDeviceId.getText().toString();
-        userName = k_userName.getText().toString();
-        userPassword = k_userPassword.getText().toString();
-        userText = k_userText.getText().toString();
+        userName = k_userName.getText().toString().replace(" ", "");
+        userPassword = k_userPassword.getText().toString().replace(" ", "");
+        userDeviceId = k_userDeviceId.getText().toString().replace(" ", "");
+        userText = k_userText.getText().toString().replace(" ", "");
     }
 
     public void readSetting() {//读取商家设置
         String str = readFile("user.ng");
         if (str.length() > 1) {
             String[] temp = str.split("\\|");
-            k_userDeviceId.setText(temp[0]);
-            k_userText.setText(temp[1]);
-            k_userName.setText(temp[2]);
-            k_userPassword.setText(temp[3]);
+            k_userName.setText(temp[0].replace(" ", ""));
+            k_userPassword.setText(temp[1].replace(" ", ""));
+            k_userDeviceId.setText(temp[2].replace(" ", ""));
+            k_userText.setText(temp[3].replace(" ", ""));
             getSetting();
             userHash = ToastUtil.stringToMD5(userName + "llrj" + userPassword);
         }
@@ -436,6 +446,7 @@ public class MainActivity extends AppCompatActivity
                 break;
             case 5://商家设置
                 page_setting.setVisibility(View.VISIBLE);
+                readSetting();
                 changeTitle(R.drawable.ic_setting_white, "商家设置");
                 break;
         }
