@@ -118,7 +118,7 @@ public class UpdataService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         try {
-            version = getVersionName();
+            version = getVersionCode();
         } catch (Exception e) {
 
         }
@@ -230,12 +230,13 @@ public class UpdataService extends Service {
         System.out.println("我的弹出对话框呢？");
     }
 
-    private String getVersionName() throws Exception {
+    //获取版本号
+    private String getVersionCode() throws Exception {
         //获取packagemanager的实例
         PackageManager packageManager = getPackageManager();
         //getPackageName()是你当前类的包名，0代表是获取版本信息
         PackageInfo packInfo = packageManager.getPackageInfo(getPackageName(), 0);
-        return packInfo.versionName;
+        return String.valueOf(packInfo.versionCode);
     }
 
     public static String toURLDecoded(String paramString) {
