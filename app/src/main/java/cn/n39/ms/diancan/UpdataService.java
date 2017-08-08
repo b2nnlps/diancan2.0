@@ -12,17 +12,21 @@ import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 import android.view.WindowManager;
+import android.webkit.MimeTypeMap;
+import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 
+import java.io.File;
 import java.net.URLDecoder;
 
 /**
@@ -44,6 +48,7 @@ public class UpdataService extends Service {
     DownloadCompleteReceiver receiver;
 
     String versionUrl = "http://ms.n39.cn/dc.php?ver=", version = "2.0", apkUrl, apkText;
+    String DOWNLOADPATH = "/cn.n39.ms.diancan/";
     String[] Data;
 
 
@@ -103,9 +108,12 @@ public class UpdataService extends Service {
         down.setVisibleInDownloadsUi(true);
 
         // 设置下载后文件存放的位置
-        down.setDestinationInExternalFilesDir(this,
-                Environment.DIRECTORY_DOWNLOADS, "dcapp.apk");
+        //down.setDestinationInExternalFilesDir(this,
+        //         Environment.DIRECTORY_DOWNLOADS, "dcapp.apk");
 
+        down.setDestinationInExternalPublicDir(DOWNLOADPATH, "dc.apk");
+
+        down.setTitle("更新中...");
         // 将下载请求放入队列
         manager.enqueue(down);
 
@@ -163,8 +171,16 @@ public class UpdataService extends Service {
                 long downId = intent.getLongExtra(
                         DownloadManager.EXTRA_DOWNLOAD_ID, -1);
 
+                if (manager.getUriForDownloadedFile(downId) != null) {
+                    //自动安装apk
+                    installAPK(manager.getUriForDownloadedFile(downId), context);
+                    //installAPK(context);
+                } else {
+                    Toast.makeText(context, "下载失败", Toast.LENGTH_SHORT).show();
+                }
+
                 //自动安装apk
-                installAPK(manager.getUriForDownloadedFile(downId));
+                //  installAPK(manager.getUriForDownloadedFile(downId));
 
                 //停止服务并关闭广播
                 UpdataService.this.stopSelf();
@@ -175,24 +191,52 @@ public class UpdataService extends Service {
         /**
          * 安装apk文件
          */
-        private void installAPK(Uri apk) {
+        private void installAPK(Uri apk, Context context) {
 
             // 通过Intent安装APK文件
-            Intent intents = new Intent();
-            System.out.println("开始安装");
-            intents.setAction("android.intent.action.VIEW");
-            intents.addCategory("android.intent.category.DEFAULT");
-            intents.setType("application/vnd.android.package-archive");
-            intents.setData(apk);
-            intents.setDataAndType(apk, "application/vnd.android.package-archive");
-            intents.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            System.out.println("配置安装");
-            startActivity(intents);
-            System.out.println("启动安装");
-            android.os.Process.killProcess(android.os.Process.myPid());
-            // 如果不加上这句的话在apk安装完成之后点击单开会崩溃
+            if (Build.VERSION.SDK_INT < 23) {
+                Intent intents = new Intent();
+                System.out.println("开始安装");
+                intents.setAction("android.intent.action.VIEW");
+                intents.addCategory("android.intent.category.DEFAULT");
+                intents.setType("application/vnd.android.package-archive");
+                intents.setData(apk);
+                intents.setDataAndType(apk, "application/vnd.android.package-archive");
+                intents.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                System.out.println("配置安装");
+                startActivity(intents);
+                System.out.println("启动安装");
+                android.os.Process.killProcess(android.os.Process.myPid());
+                // 如果不加上这句的话在apk安装完成之后点击单开会崩溃
+            } else {
+                File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + DOWNLOADPATH + "dc.apk");
+                if (file.exists()) {
+                    openFile(file, context);
+                }
+            }
         }
+    }
 
+    public void openFile(File file, Context context) {
+        Intent intent = new Intent();
+        intent.addFlags(268435456);
+        intent.setAction("android.intent.action.VIEW");
+        String type = getMIMEType(file);
+        intent.setDataAndType(Uri.fromFile(file), type);
+        try {
+            context.startActivity(intent);
+        } catch (Exception var5) {
+            var5.printStackTrace();
+            Toast.makeText(context, "没有找到打开此类文件的程序", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public String getMIMEType(File var0) {
+        String var1 = "";
+        String var2 = var0.getName();
+        String var3 = var2.substring(var2.lastIndexOf(".") + 1, var2.length()).toLowerCase();
+        var1 = MimeTypeMap.getSingleton().getMimeTypeFromExtension(var3);
+        return var1;
     }
 
     private void showNormalDialog(String mess, String force) {
@@ -206,11 +250,23 @@ public class UpdataService extends Service {
         builder.setIcon(R.drawable.ic_kitchen);
         builder.setTitle("有新版本");
         builder.setMessage(mess);
-        builder.setPositiveButton("更新",
+        builder.setPositiveButton("自动更新",//系统下载
                 new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        initDownManager();//更新
+                        initDownManager();//自动更新
+                    }
+                });
+        builder.setNeutralButton("手动更新",
+                new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Intent intent = new Intent();//浏览器下载
+                        intent.setAction("android.intent.action.VIEW");
+                        Uri content_url = Uri.parse("http://ms.n39.cn/dcsd.php");
+                        intent.setData(content_url);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
                     }
                 });
         if (force.equals("1")) {//如果不是强制更新 1为正常 2为强制
