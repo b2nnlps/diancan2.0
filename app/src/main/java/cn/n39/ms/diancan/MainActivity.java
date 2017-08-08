@@ -31,6 +31,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.WindowManager;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
@@ -69,11 +70,11 @@ public class MainActivity extends AppCompatActivity
     private MyBluetoothAdapter unboundAdapter;
     private String defaultDevice = "";
     private boolean isPrinter = false;
-    String userId, userName, userPassword, userText, userHash;
+    String userDeviceId, userName, userPassword, userText, userHash;
     //=================绑定控件====================
     Button btnOpen, btnSearch, btn_save;
     ListView lvUnboundDevice, lvBoundDevice;
-    EditText k_userId, k_userName, k_userPassword, k_userText;
+    EditText k_userDeviceId, k_userName, k_userPassword, k_userText;
     Toolbar toolbar;
     private WebView mWebView;
 
@@ -86,6 +87,7 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);   //保持屏幕常亮
         initPage();
     }
 
@@ -330,7 +332,7 @@ public class MainActivity extends AppCompatActivity
         btn_save = (Button) findViewById(R.id.btn_save);
         lvBoundDevice = (ListView) findViewById(R.id.lv_bound_device);
         lvUnboundDevice = (ListView) findViewById(R.id.lv_unbound_device);
-        k_userId = (EditText) findViewById(R.id.userId);
+        k_userDeviceId = (EditText) findViewById(R.id.userDeviceId);
         k_userName = (EditText) findViewById(R.id.userName);
         k_userPassword = (EditText) findViewById(R.id.userPassword);
         k_userText = (EditText) findViewById(R.id.userText);
@@ -344,12 +346,14 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onClick(View v) {
                 getSetting();
-                if (userId.length() == 0 || userText.length() == 0 || userName.length() == 0 || userPassword.length() == 0) {
-                    Toast.makeText(MainActivity.this, "都必须要填写", Toast.LENGTH_LONG).show();
+                if (userName.length() == 0 || userPassword.length() == 0) {
+                    Toast.makeText(MainActivity.this, "前两项必须要填写", Toast.LENGTH_LONG).show();
                     return;
                 }
-                getSetting();
-                String str = userId + "|" + userText + "|" + userName + "|" + userPassword;
+                if (userDeviceId.length() == 0) userDeviceId = " ";//自动补
+                if (userText.length() == 0) userText = " ";//自动补
+
+                String str = userName + "|" + userPassword + "|" + userDeviceId + "|" + userText;
                 writeFile("user.ng", str);//保存设置
                 userHash = ToastUtil.stringToMD5(userName + "llrj" + userPassword);
                 Toast.makeText(MainActivity.this, "保存成功！", Toast.LENGTH_LONG).show();
@@ -365,7 +369,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void getSetting() {//获取商家设置
-        userId = k_userId.getText().toString();
+        userDeviceId = k_userDeviceId.getText().toString();
         userName = k_userName.getText().toString();
         userPassword = k_userPassword.getText().toString();
         userText = k_userText.getText().toString();
@@ -375,7 +379,7 @@ public class MainActivity extends AppCompatActivity
         String str = readFile("user.ng");
         if (str.length() > 1) {
             String[] temp = str.split("\\|");
-            k_userId.setText(temp[0]);
+            k_userDeviceId.setText(temp[0]);
             k_userText.setText(temp[1]);
             k_userName.setText(temp[2]);
             k_userPassword.setText(temp[3]);
@@ -397,6 +401,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void showPage(int page) {//切换界面
+        String url = "?username=" + userName + "&hash=" + userHash + "&device_id=" + userDeviceId;
         page_setting.setVisibility(View.GONE);
         page_main.setVisibility(View.GONE);
         page_printer.setVisibility(View.GONE);
@@ -408,17 +413,17 @@ public class MainActivity extends AppCompatActivity
                 break;
             case 1://订单查看
                 page_web.setVisibility(View.VISIBLE);
-                mWebView.loadUrl("file:///android_asset/order-list.html?username=" + userName + "&hash=" + userHash);
+                mWebView.loadUrl("file:///android_asset/order-list.html" + url);
                 changeTitle(R.drawable.ic_order_white, "订单查看");
                 break;
             case 2://厨房订单
                 page_web.setVisibility(View.VISIBLE);
-                mWebView.loadUrl("file:///android_asset/cpdl.html?username=" + userName + "&hash=" + userHash);
+                mWebView.loadUrl("file:///android_asset/cpdl.html" + url);
                 changeTitle(R.drawable.ic_kitchen_white, "厨房订单");
                 break;
             case 3://传菜订单
                 page_web.setVisibility(View.VISIBLE);
-                mWebView.loadUrl("file:///android_asset/ccdl.html?username=" + userName + "&hash=" + userHash);
+                mWebView.loadUrl("file:///android_asset/ccdl.html" + url);
                 changeTitle(R.drawable.ic_chuancai_white, "传菜订单");
                 break;
             case 4://打印机连接
