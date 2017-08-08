@@ -1,26 +1,17 @@
 package cn.n39.ms.diancan;
 
-import android.app.AlertDialog;
 import android.app.Notification;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
-import android.media.SoundPool;
-import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
-import android.util.Log;
-import android.view.KeyEvent;
-import android.view.View;
 import android.widget.Toast;
 
 import java.io.DataInputStream;
@@ -38,15 +29,13 @@ public class PrintActivity extends Service {
     private static final UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
     BluetoothDevice device;
-    private boolean isConnection;
     private BluetoothSocket bluetoothSocket;
     private ArrayList<BluetoothSocket> printers = new ArrayList<>();
     private ArrayList<BluetoothDevice> bondDevicesList = new ArrayList<>();
     private boolean TCPon = false, autoConnent = true;
-    private String myAddress = "";
+    private String myAddress = "", cmd = "", lastUserData = "";
     private String[] userData;
     private int printerCount = 0;
-    private SoundPool soundPool;
     BluetoothSocket printer;
     OutputStream outputStream;
 
@@ -71,6 +60,9 @@ public class PrintActivity extends Service {
                     player.start();
 
                     //在这里进行UI操作，将结果显示到界面上
+                    break;
+                case 1:
+                    System.out.println(response);//打印错误信息
                     break;
                 default:
                     break;
@@ -105,21 +97,24 @@ public class PrintActivity extends Service {
     }
 
     private void initData(Intent intent) {
-        String str = readFile("user.ng");
-        if (str.length() > 1) {//设置了商家信息才启动线程和连接
+        readFile("user.ng");
+        if (userData[2].length() > 1) {//设置了设备ID才启动线程和连接
             isDisconnect();//更新打印机状态
+            cmd = intent.getStringExtra(MainActivity.CMD);//获取命令，字符串类型
+            System.out.println(cmd);
+            if (cmd.equals("reConnect")) {//重连服务器，readFile里自带了
+                return;
+            }
             device = intent.getParcelableExtra(MainActivity.DEVICE);
+
             if (!bondDevicesList.contains(device)) {//是否已连接过 没有点击或或者连接丢失
-                userData = str.split("\\|");
                 startConnect();
-                ServerListener mt = new ServerListener();
-                new Thread(mt).start();
             } else {
                 ToastUtil.showToast(PrintActivity.this, "已连接！");
             }
         } else {
             autoConnent = false;
-            Toast.makeText(PrintActivity.this, "提示，你还未设置商家信息。", Toast.LENGTH_LONG).show();
+            Toast.makeText(PrintActivity.this, "您还未设置打印机编号", Toast.LENGTH_LONG).show();
             stopSelf();
         }
 
@@ -143,6 +138,9 @@ public class PrintActivity extends Service {
                 System.out.println("蓝牙没扫描到！");
             }
             setConnectResult(bluetoothSocket.isConnected());
+            //蓝牙连接成功后才连接服务器
+            ServerListener mt = new ServerListener();
+            new Thread(mt).start();
         } catch (Exception e) {
             setConnectResult(false);
         }
@@ -208,6 +206,7 @@ public class PrintActivity extends Service {
         public void run() {
             android.os.Process.setThreadPriority(10);
             while (autoConnent) {  //自动重连
+                if (!TCPon) {//只连接一次
                     try {
                         mySocket = new Socket("121.42.24.85", 45612);
                         DataInputStream input = new DataInputStream(mySocket.getInputStream());
@@ -240,6 +239,7 @@ public class PrintActivity extends Service {
                         }
 
                     } catch (Exception ex) {
+                        //连接断开
                         TCPon = false;
                         Message message = new Message();
                         message.what = 1;
@@ -247,9 +247,10 @@ public class PrintActivity extends Service {
                         message.obj = ex.toString();
                         handler.sendMessage(message);
                     }
+                }
 
                 try {
-                    Thread.sleep(5000);  //5s延迟重连
+                    Thread.sleep(3000);  //5s延迟重连
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -277,7 +278,7 @@ public class PrintActivity extends Service {
         }
     }
     /**
-     * 断开蓝牙设备连接
+     * 断开蓝牙设备连接,服务关闭的时候触发
      */
     public void disconnect() {
         System.out.println("断开蓝牙设备连接");
@@ -298,7 +299,7 @@ public class PrintActivity extends Service {
 
     }
 
-    public String readFile(String fileName) {
+    public String readFile(String fileName) {//读取商家设置文件，如果有变更则重连服务器
         String res = "";
         try {
             FileInputStream fin = openFileInput(fileName);
@@ -307,6 +308,17 @@ public class PrintActivity extends Service {
             fin.read(buffer);
             res = new String(buffer);
             fin.close();
+            if (res.length() > 1) {
+                userData = res.split("\\|");
+            }
+            if (lastUserData.length() != 0) {
+                if (!res.equals(lastUserData)) //如果发生了信息变更则重连
+                    try {
+                        mySocket.close();
+                    } catch (IOException e) {
+
+                    }
+            } else lastUserData = res;
         } catch (Exception e) {
         }
         return res;
