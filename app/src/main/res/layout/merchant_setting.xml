@@ -46,6 +46,8 @@
         android:layout_marginTop="25dp"
         android:id="@+id/userName"
         android:hint="账户名"
+        android:maxLines="1"
+        android:imeOptions="actionNext"
         android:layout_alignParentTop="true"
         android:layout_toEndOf="@+id/imageView2"
         android:layout_marginStart="17dp" />
@@ -58,6 +60,8 @@
         android:layout_marginTop="34dp"
         android:id="@+id/userPassword"
         android:hint="密码"
+        android:maxLines="1"
+        android:imeOptions="actionNext"
         android:layout_below="@+id/userName"
         android:layout_alignStart="@+id/userName" />
 
@@ -68,6 +72,8 @@
         android:layout_marginTop="34dp"
         android:id="@+id/userDeviceId"
         android:hint="打印机编号"
+        android:maxLines="1"
+        android:imeOptions="actionNext"
         android:layout_below="@+id/userPassword"
         android:layout_alignStart="@+id/userPassword" />
 
@@ -96,18 +102,18 @@
         android:ems="10"
         android:id="@+id/userText"
         android:hint="打印后缀"
+
         android:layout_marginTop="34dp"
         android:layout_below="@+id/userDeviceId"
         android:layout_alignStart="@+id/userDeviceId" />
 
     <TextView
-        android:text="TextView"
+        android:text="以上信息由玲珑软件公司负责提供"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/btn_save"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="37dp"
+        android:layout_marginTop="35dp"
         android:id="@+id/textView2"
-        tools:text="以上信息由玲珑软件公司负责提供" />
+        android:layout_below="@+id/btn_save"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>

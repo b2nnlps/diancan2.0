@@ -1,12 +1,13 @@
 /*
  API公共库
  */
-var username, hash, addUrl, newMess = false, firstOpen = 0;
+var username, hash, device_id, addUrl, newMess = false, firstOpen = 0;
 var orders = [];
 
 username = getQueryString("username");
 hash = getQueryString("hash");
-addUrl = "username=" + username + "&hash=" + hash;
+device_id = getQueryString("device_id");
+addUrl = "username=" + username + "&hash=" + hash + "&device_id=" + device_id;
 
 function ccdl(res, status) {
     var i, text = "", len = res.length;
@@ -23,8 +24,8 @@ function ccdl(res, status) {
             text += "<div class=\"pot_box\">";
             if (status == 1)
                 text += "<input type=\"checkbox\" id=\"checkbox_d" + res[i].id + "\" class=\"chk_4\" onclick=\"chuanCai(" + res[i].id + ")\"/><label for=\"checkbox_d" + res[i].id + "\"></label>";
-            //if(status==2)
-            //text+="<input type=\"checkbox\" id=\"checkbox_y"+i+"\" class=\"chk_4\" checked/><label for=\"checkbox_y"+i+"\"></label>";
+            // if(status == 2)
+            //		text+='<div class="my_center"><i>'+res[i].+'</i></div>';
             text += "</div>";
             text += "</ul>";
         }

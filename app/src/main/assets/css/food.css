@@ -168,6 +168,10 @@ textarea, button, select, input {
     position: relative;
 }
 
+.my_center{position:absolute;right:10px; top:20px;}
+.my_center img{ width:30px; height:30px; border-radius:100px;}
+.my_center i{text-align:center; font-size:14px; color:#000; line-height:30px; padding:0 5px; color:#666;}
+
 .cuisine_box ul div {
     padding: 5px 0;
     color: #333;
