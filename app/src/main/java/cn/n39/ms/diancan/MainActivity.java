@@ -413,17 +413,20 @@ public class MainActivity extends AppCompatActivity
                 break;
             case 1://订单查看
                 page_web.setVisibility(View.VISIBLE);
-                mWebView.loadUrl("file:///android_asset/order-list.html" + url);
+                //  mWebView.loadUrl("file:///android_asset/order-list.html" + url);
+                mWebView.loadUrl("http://ms.n39.cn/dc/order-list.html" + url);
                 changeTitle(R.drawable.ic_order_white, "订单查看");
                 break;
             case 2://厨房订单
                 page_web.setVisibility(View.VISIBLE);
-                mWebView.loadUrl("file:///android_asset/cpdl.html" + url);
+                //mWebView.loadUrl("file:///android_asset/cpdl.html" + url);
+                mWebView.loadUrl("http://ms.n39.cn/dc/cpdl.html" + url);
                 changeTitle(R.drawable.ic_kitchen_white, "厨房订单");
                 break;
             case 3://传菜订单
                 page_web.setVisibility(View.VISIBLE);
-                mWebView.loadUrl("file:///android_asset/ccdl.html" + url);
+                // mWebView.loadUrl("file:///android_asset/ccdl.html" + url);
+                mWebView.loadUrl("http://ms.n39.cn/dc/ccdl.html" + url);
                 changeTitle(R.drawable.ic_chuancai_white, "传菜订单");
                 break;
             case 4://打印机连接
