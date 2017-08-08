@@ -49,7 +49,6 @@ public class PrintActivity extends Service {
     private SoundPool soundPool;
     BluetoothSocket printer;
     OutputStream outputStream;
-    public static final String TAG = "MyService";
 
     private Handler handler = new Handler() {
 
@@ -140,9 +139,8 @@ public class PrintActivity extends Service {
             bluetoothSocket.connect();
             printers.add(bluetoothSocket);//如果连接成功，加入打印机输出流列表
             bondDevicesList.add(device);//添加到已连接队列
-            if (bluetoothAdapter.isDiscovering()) {
-                System.out.println("关闭适配器！");
-                bluetoothAdapter.isDiscovering();
+            if (!bluetoothAdapter.isDiscovering()) {
+                System.out.println("蓝牙没扫描到！");
             }
             setConnectResult(bluetoothSocket.isConnected());
         } catch (Exception e) {
@@ -174,7 +172,7 @@ public class PrintActivity extends Service {
         int a = sendData.length();
         String deng = sendData.substring(a - 1, a);
         if (deng.equals("="))//如果结束了
-            sendData = sendData + "\n" + userData[1] + "\n\n\n";//3行回车正好
+            sendData = sendData + "\n" + userData[3] + "\n\n\n";//3行回车正好加上打印后缀
         int i;
         BluetoothSocket printer;
         for (i = 0; i < printers.size(); i++) {
@@ -188,9 +186,8 @@ public class PrintActivity extends Service {
                         outputStream.write(CommandsUtil.BYTE_COMMANDS[4]);//加大字体
                         outputStream.write(CommandsUtil.BYTE_COMMANDS[6]);//加粗打印订单号
                         outputStream.write(print_no, 0, print_no.length);
-                        outputStream.write(CommandsUtil.BYTE_COMMANDS[3]);//变小字体
-                        outputStream.write(CommandsUtil.BYTE_COMMANDS[5]);//取消加粗
                     }
+                    outputStream.write(CommandsUtil.BYTE_COMMANDS[13]);//变小字体
                     outputStream.write(print_data, 0, print_data.length);
                     outputStream.flush();
                 } catch (IOException e) {
@@ -211,13 +208,12 @@ public class PrintActivity extends Service {
         public void run() {
             android.os.Process.setThreadPriority(10);
             while (autoConnent) {  //自动重连
-                if (!TCPon)
                     try {
                         mySocket = new Socket("121.42.24.85", 45612);
                         DataInputStream input = new DataInputStream(mySocket.getInputStream());
                         DataOutputStream ouput = new DataOutputStream(mySocket.getOutputStream());
 
-                        String str1 = userData[0];
+                        String str1 = userData[2];
                         byte[] a = str1.getBytes();
                         ouput.write(a, 0, str1.length());
                         ouput.flush();
@@ -253,7 +249,7 @@ public class PrintActivity extends Service {
                     }
 
                 try {
-                    Thread.sleep(3000);  //3s延迟重连
+                    Thread.sleep(5000);  //5s延迟重连
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -273,9 +269,10 @@ public class PrintActivity extends Service {
 //                } catch (IOException e) {
 //                    e.printStackTrace();
 //                }
+                System.out.println(i);
                 j = printers.indexOf(printer);
-                printers.remove(j);
-                bondDevicesList.remove(j);
+                printers.remove(printers.get(j));
+                bondDevicesList.remove(bondDevicesList.get(j));
             }
         }
     }
