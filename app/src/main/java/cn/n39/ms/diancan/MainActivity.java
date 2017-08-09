@@ -54,7 +54,7 @@ import java.util.UUID;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    private View page_main, page_setting, page_printer, page_web;
+    private View page_setting, page_printer, page_web;
     //===============搜索蓝牙打印机================
     private BluetoothAdapter mBluetoothAdapter;
     private static final int REQUEST_ENABLE_BT = 1;
@@ -331,7 +331,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void initPage() {//初始化绑定控件界面
-        page_main = findViewById(R.id.page_main);
         page_setting = findViewById(R.id.page_setting);
         page_printer = findViewById(R.id.page_printer);
         page_web = findViewById(R.id.page_order);
@@ -381,7 +380,7 @@ public class MainActivity extends AppCompatActivity
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.getSettings().setAllowFileAccess(true);
         mWebView.getSettings().setMediaPlaybackRequiresUserGesture(false);
-
+        showPage(0);
     }
 
     public void getSetting() {//获取商家设置
@@ -419,12 +418,12 @@ public class MainActivity extends AppCompatActivity
     public void showPage(int page) {//切换界面
         String url = "?username=" + userName + "&hash=" + userHash + "&device_id=" + userDeviceId;
         page_setting.setVisibility(View.GONE);
-        page_main.setVisibility(View.GONE);
         page_printer.setVisibility(View.GONE);
         page_web.setVisibility(View.GONE);
         switch (page) {
             case 0://首页
-                page_main.setVisibility(View.VISIBLE);
+                page_web.setVisibility(View.VISIBLE);
+                mWebView.loadUrl("http://ms.n39.cn/dc/index.html" + url);
                 changeTitle(R.drawable.ic_index_white, "首页");
                 break;
             case 1://订单查看
