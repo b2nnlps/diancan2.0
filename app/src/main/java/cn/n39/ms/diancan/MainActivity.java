@@ -435,7 +435,7 @@ public class MainActivity extends AppCompatActivity
             case 2://厨房订单
                 page_web.setVisibility(View.VISIBLE);
                 //mWebView.loadUrl("file:///android_asset/cpdl.html" + url);
-                mWebView.loadUrl("http://ms.n39.cn/dc/cpdl.html" + url);
+                mWebView.loadUrl("http://ms.n39.cn/dc/cfdl.html" + url);
                 changeTitle(R.drawable.ic_kitchen_white, "厨房订单");
                 break;
             case 3://传菜订单
