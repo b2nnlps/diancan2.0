@@ -30,8 +30,8 @@
     <!--app:srcCompat="@android:drawable/ic_dialog_email" />-->
 
     <include
-        android:id="@+id/page_main"
-        layout="@layout/content_main"
+        android:id="@+id/page_order"
+        layout="@layout/order_view"
         android:visibility="visible" />
 
     <include
@@ -42,11 +42,6 @@
     <include
         android:id="@+id/page_printer"
         layout="@layout/printer_connect"
-        android:visibility="invisible" />
-
-    <include
-        android:id="@+id/page_order"
-        layout="@layout/order_view"
         android:visibility="invisible" />
 
 
