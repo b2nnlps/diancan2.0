@@ -183,7 +183,7 @@ public class PrintActivity extends Service {
                         byte[] print_no = no.getBytes("gbk");
                         outputStream.write(CommandsUtil.BYTE_COMMANDS[4]);//加大字体
                         outputStream.write(CommandsUtil.BYTE_COMMANDS[6]);//加粗打印订单号
-                        outputStream.write(print_no, 0, print_no.length);
+                        //      outputStream.write(print_no, 0, print_no.length);
                     }
                     outputStream.write(CommandsUtil.BYTE_COMMANDS[13]);//变小字体
                     outputStream.write(print_data, 0, print_data.length);
