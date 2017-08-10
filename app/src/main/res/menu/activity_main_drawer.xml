@@ -33,10 +33,10 @@
             <item
                 android:id="@+id/nav_contact"
                 android:icon="@drawable/ic_mess"
-                android:title="玲珑软件" />
+                android:title="在线反馈" />
             <item
                 android:id="@+id/nav_company"
-                android:icon="@drawable/ic_menu_send"
+                android:icon="@drawable/ic_about"
                 android:title="关于我们" />
         </menu>
     </item>
