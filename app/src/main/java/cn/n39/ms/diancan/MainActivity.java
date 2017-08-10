@@ -486,6 +486,9 @@ public class MainActivity extends AppCompatActivity
                 drawer.closeDrawer(GravityCompat.START);
             }
         } finally {
+            if (mWebView.canGoBack()) {
+                mWebView.goBack();// 返回前一个页面
+            } else
             moveTaskToBack(true);
         }
     }
