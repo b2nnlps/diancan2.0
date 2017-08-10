@@ -435,7 +435,7 @@ public class MainActivity extends AppCompatActivity
             case 0://首页
                 page_web.setVisibility(View.VISIBLE);
                 mWebView.loadUrl("http://ms.n39.cn/dc/index.html" + url);
-                changeTitle(R.drawable.ic_index_white, "首页");
+                changeTitle(R.drawable.ic_index_white, "容合点餐");
                 break;
             case 1://订单查看
                 page_web.setVisibility(View.VISIBLE);
@@ -464,6 +464,16 @@ public class MainActivity extends AppCompatActivity
                 page_setting.setVisibility(View.VISIBLE);
                 readSetting();
                 changeTitle(R.drawable.ic_setting_white, "商家设置");
+                break;
+            case 6://在线反馈
+                page_web.setVisibility(View.VISIBLE);
+                mWebView.loadUrl("http://ms.n39.cn/dc/contact.html" + url);
+                changeTitle(R.drawable.ic_mess_white, "在线反馈");
+                break;
+            case 7://关于我们
+                page_web.setVisibility(View.VISIBLE);
+                mWebView.loadUrl("http://ms.n39.cn/dc/about.html" + url);
+                changeTitle(R.drawable.ic_mess_white, "关于我们");
                 break;
         }
     }
@@ -520,6 +530,10 @@ public class MainActivity extends AppCompatActivity
             showPage(4);
         } else if (id == R.id.nav_manager) {
             showPage(5);
+        } else if (id == R.id.nav_contact) {
+            showPage(6);
+        } else if (id == R.id.nav_company) {
+            showPage(7);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
