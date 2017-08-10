@@ -473,7 +473,7 @@ public class MainActivity extends AppCompatActivity
             case 7://关于我们
                 page_web.setVisibility(View.VISIBLE);
                 mWebView.loadUrl("http://ms.n39.cn/dc/about.html" + url);
-                changeTitle(R.drawable.ic_mess_white, "关于我们");
+                changeTitle(R.drawable.ic_about_white, "关于我们");
                 break;
         }
     }
