@@ -47,7 +47,7 @@ public class UpdataService extends Service {
      **/
     DownloadCompleteReceiver receiver;
 
-    String versionUrl = "http://ms.n39.cn/dc.php?ver=", version = "2.0", apkUrl, apkText;
+    String versionUrl = "http://ms.n39.cn/dc.php?ver=", versionCode = "90", apkUrl, apkText;
     String DOWNLOADPATH = "/cn.n39.ms.diancan/";
     String[] Data;
 
@@ -125,12 +125,7 @@ public class UpdataService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        try {
-            version = getVersionCode();
-        } catch (Exception e) {
-
-        }
-        versionUrl += version;
+        versionUrl += versionCode;
         System.out.println(versionUrl);
 
         // 检测更新
@@ -286,16 +281,7 @@ public class UpdataService extends Service {
         System.out.println("我的弹出对话框呢？");
     }
 
-    //获取版本号
-    private String getVersionCode() throws Exception {
-        //获取packagemanager的实例
-        PackageManager packageManager = getPackageManager();
-        //getPackageName()是你当前类的包名，0代表是获取版本信息
-        PackageInfo packInfo = packageManager.getPackageInfo(getPackageName(), 0);
-        return String.valueOf(packInfo.versionCode);
-    }
-
-    public static String toURLDecoded(String paramString) {
+    public static String toURLDecoded(String paramString) {//支持中文
         if (paramString == null || paramString.equals("")) {
             //  LogD("toURLDecoded error:"+paramString);
             return "";
