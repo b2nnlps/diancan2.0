@@ -47,7 +47,7 @@ public class UpdataService extends Service {
      **/
     DownloadCompleteReceiver receiver;
 
-    String versionUrl = "http://ms.n39.cn/dc.php?ver=", versionCode = "90", apkUrl, apkText;
+    String versionUrl = "http://ms.n39.cn/dc.php?ver=", versionCode = "91", apkUrl, apkText;
     String DOWNLOADPATH = "/cn.n39.ms.diancan/";
     String[] Data;
 
