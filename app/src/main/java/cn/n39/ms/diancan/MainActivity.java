@@ -1,6 +1,7 @@
 package cn.n39.ms.diancan;
 
 import android.Manifest;
+import android.app.KeyguardManager;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -14,6 +15,7 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
@@ -81,6 +83,7 @@ public class MainActivity extends AppCompatActivity
     EditText k_userDeviceId, k_userName, k_userPassword, k_userText;
     Toolbar toolbar;
     private WebView mWebView;
+    public static PowerManager.WakeLock wakeLock, wakeLock2 = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -92,9 +95,10 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);   //保持屏幕常亮
 
-        instance = this;    //用于弹窗依赖
+
+        instance = this;    //用于弹窗依赖和唤醒
+        acquireWakeLock(false);   //保持屏幕常亮
         checkUpdate();//检测更新
         initPage();
 
@@ -549,6 +553,7 @@ public class MainActivity extends AppCompatActivity
         super.onDestroy();
         try {
             unregisterReceiver(deviceReceiver);
+            releaseWakeLock();
         } catch (Exception e) {
 
         }
@@ -570,6 +575,40 @@ public class MainActivity extends AppCompatActivity
             }
         }).start();
 
+    }
+
+    //获取电源锁，保持该服务在屏幕熄灭时仍然获取CPU时，保持运行
+    public static void acquireWakeLock(boolean force) {
+        if (force) {
+            KeyguardManager km = (KeyguardManager) instance.getSystemService(Context.KEYGUARD_SERVICE);
+            KeyguardManager.KeyguardLock kl = km.newKeyguardLock("unLock");
+            //解锁
+            kl.disableKeyguard();
+            //获取电源管理器对象
+            PowerManager pm = (PowerManager) instance.getSystemService(Context.POWER_SERVICE);
+            //获取PowerManager.WakeLock对象,后面的参数|表示同时传入两个值,最后的是LogCat里用的Tag
+            PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_DIM_WAKE_LOCK, "bright");
+            //点亮屏幕
+            wl.acquire();
+            //释放
+            wl.release();
+        } else {
+            if (null == wakeLock) {
+                PowerManager pm = (PowerManager) instance.getSystemService(Context.POWER_SERVICE);
+                wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE, "PrintService");
+                if (wakeLock != null) {
+                    wakeLock.acquire();
+                }
+            }
+        }
+    }
+
+    //释放设备电源锁
+    private void releaseWakeLock() {
+        if (null != wakeLock) {
+            wakeLock.release();
+            wakeLock = null;
+        }
     }
 
     public static Context getMyApplication() {
