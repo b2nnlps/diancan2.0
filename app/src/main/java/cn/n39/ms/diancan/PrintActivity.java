@@ -59,6 +59,8 @@ public class PrintActivity extends Service {
                     MediaPlayer player = MediaPlayer.create(PrintActivity.this, R.raw.dingdong);
                     player.start();
 
+                    MainActivity.acquireWakeLock(true); //唤醒屏幕
+
                     //在这里进行UI操作，将结果显示到界面上
                     break;
                 case 1:
