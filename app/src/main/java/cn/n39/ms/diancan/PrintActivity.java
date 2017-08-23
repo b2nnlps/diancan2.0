@@ -1,16 +1,19 @@
 package cn.n39.ms.diancan;
 
+import android.app.KeyguardManager;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.Service;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
+import android.os.PowerManager;
 import android.text.TextUtils;
 import android.widget.Toast;
 
@@ -36,6 +39,7 @@ public class PrintActivity extends Service {
     private String myAddress = "", cmd = "", lastUserData = "";
     private String[] userData;
     private int printerCount = 0;
+    public PowerManager.WakeLock wakeLock = null;
     BluetoothSocket printer;
     OutputStream outputStream;
 
@@ -59,7 +63,7 @@ public class PrintActivity extends Service {
                     MediaPlayer player = MediaPlayer.create(PrintActivity.this, R.raw.dingdong);
                     player.start();
 
-                    MainActivity.acquireWakeLock(true); //唤醒屏幕
+                    acquireWakeLock(true); //唤醒屏幕
 
                     //在这里进行UI操作，将结果显示到界面上
                     break;
@@ -83,6 +87,7 @@ public class PrintActivity extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         initData(intent);
+        acquireWakeLock(false);
 //        return super.onStartCommand(intent, flags, startId);
         return START_REDELIVER_INTENT;//保持进程后台运行
     }
@@ -99,6 +104,7 @@ public class PrintActivity extends Service {
     }
 
     private void initData(Intent intent) {
+        System.out.println("启动Service");
         readFile("user.ng");
         if (userData[2].length() > 1) {//设置了设备ID才启动线程和连接
             isDisconnect();//更新打印机状态
@@ -137,7 +143,7 @@ public class PrintActivity extends Service {
             printers.add(bluetoothSocket);//如果连接成功，加入打印机输出流列表
             bondDevicesList.add(device);//添加到已连接队列
             if (!bluetoothAdapter.isDiscovering()) {
-                System.out.println("蓝牙没扫描到！");
+                //     System.out.println("蓝牙没扫描到！");
             }
             setConnectResult(bluetoothSocket.isConnected());
             //蓝牙连接成功后才连接服务器
@@ -218,6 +224,7 @@ public class PrintActivity extends Service {
                         byte[] a = str1.getBytes();
                         ouput.write(a, 0, str1.length());
                         ouput.flush();
+                        System.out.println("连接服务器...");
 
                         TCPon = true;
                         byte[] b = new byte[65535];
@@ -248,6 +255,7 @@ public class PrintActivity extends Service {
                         //将服务器返回的结果存放到Message中
                         message.obj = ex.toString();
                         handler.sendMessage(message);
+                        System.out.println("TCP连接 被断开");
                     }
                 }
 
@@ -257,6 +265,7 @@ public class PrintActivity extends Service {
                     e.printStackTrace();
                 }
             }
+            System.out.println("线程被终止");
         }
     }
 
@@ -301,6 +310,32 @@ public class PrintActivity extends Service {
 
     }
 
+    //获取电源锁，保持该服务在屏幕熄灭时仍然获取CPU时，保持运行
+    public void acquireWakeLock(boolean force) {
+        if (force) {
+            KeyguardManager km = (KeyguardManager) this.getSystemService(Context.KEYGUARD_SERVICE);
+            KeyguardManager.KeyguardLock kl = km.newKeyguardLock("unLock");
+            //解锁
+            kl.disableKeyguard();
+            //获取电源管理器对象
+            PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
+            //获取PowerManager.WakeLock对象,后面的参数|表示同时传入两个值,最后的是LogCat里用的Tag
+            PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_DIM_WAKE_LOCK, "bright");
+            //点亮屏幕
+            wl.acquire();
+            //释放
+            wl.release();
+        } else {
+            if (null == wakeLock) {
+                PowerManager pm = (PowerManager) this.getSystemService(Context.POWER_SERVICE);
+                wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "PrintService");
+                if (wakeLock != null) {
+                    wakeLock.acquire();
+                }
+            }
+        }
+    }
+
     public String readFile(String fileName) {//读取商家设置文件，如果有变更则重连服务器
         String res = "";
         try {
@@ -338,8 +373,13 @@ public class PrintActivity extends Service {
     }
     @Override
     public void onDestroy() {
-        super.onDestroy();
+        System.out.println("Service 被停止");
         disconnect();
+        if (autoConnent) {
+            Intent service = new Intent(this, PrintActivity.class);
+            startService(service);
+            super.onDestroy();
+        }
     }
 
     @Override
