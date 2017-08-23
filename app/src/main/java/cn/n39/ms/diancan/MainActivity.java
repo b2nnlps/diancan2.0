@@ -1,29 +1,18 @@
 package cn.n39.ms.diancan;
 
 import android.Manifest;
-import android.app.KeyguardManager;
 import android.app.ProgressDialog;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothSocket;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
-import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
-import android.os.PowerManager;
 import android.support.annotation.NonNull;
-import android.support.design.widget.CoordinatorLayout;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -34,8 +23,6 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.WindowManager;
-import android.webkit.JavascriptInterface;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.AdapterView;
@@ -46,12 +33,9 @@ import android.widget.Toast;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Set;
-import java.util.UUID;
 
 import static android.webkit.WebSettings.LOAD_NO_CACHE;
 
@@ -75,7 +59,7 @@ public class MainActivity extends AppCompatActivity
     private MyBluetoothAdapter unboundAdapter;
     private String defaultDevice = "";
     private boolean isPrinter = false;
-    String userDeviceId, userName, userPassword, userText, userHash;
+    String userDeviceId = "", userName = "", userPassword = "", userText = "", userHash = "";
     //=================绑定控件====================
     Button btnOpen, btnSearch, btn_save;
     ListView lvUnboundDevice, lvBoundDevice;
@@ -358,27 +342,15 @@ public class MainActivity extends AppCompatActivity
         btn_save.setOnClickListener(new View.OnClickListener() {//搜索蓝牙设备
             @Override
             public void onClick(View v) {
-                getSetting();
+                getSetting(); //获取输入框里面的信息
                 if (userName.length() == 0 || userPassword.length() == 0) {
                     Toast.makeText(MainActivity.this, "前两项必须要填写", Toast.LENGTH_LONG).show();
                     return;
                 }
-                if (userDeviceId.length() == 0) userDeviceId = " ";//自动补
-                if (userText.length() == 0) userText = " ";//自动补
-
-                String str = userName + "|" + userPassword + "|" + userDeviceId + "|" + userText;
-                writeFile("user.ng", str);//保存设置
-                userHash = ToastUtil.stringToMD5(userName + "llrj" + userPassword);
-                Toast.makeText(MainActivity.this, "保存成功！", Toast.LENGTH_LONG).show();
-                //重置连接
-                Intent intent = new Intent(MainActivity.this, PrintActivity.class);
-                intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
-
-                intent.putExtra(CMD, "reConnect");
-                startService(intent);
+                saveSetting();
             }
         });
-        readSetting();
+
         mWebView = (WebView) findViewById(R.id.webview);
         // 启用javascript
         mWebView.getSettings().setJavaScriptEnabled(true);
@@ -393,15 +365,37 @@ public class MainActivity extends AppCompatActivity
             }
         });
         mWebView.addJavascriptInterface(this, "wx");
-        showPage(0);
+
+        readSetting();//先获取到信息
+        showPage(0);//切换首页
+        readSetting();//如果信息为空则跳转到登录
+    }
+
+    public void saveSetting() {
+        if (userDeviceId.length() == 0) userDeviceId = " ";//自动补
+        if (userText.length() == 0) userText = " ";//自动补
+        String str = userName + "|" + userPassword + "|" + userDeviceId + "|" + userText;
+        writeFile("user.ng", str);//保存设置
+        userHash = ToastUtil.stringToMD5(userName + "llrj" + userPassword);
+        Toast.makeText(MainActivity.this, "保存成功！", Toast.LENGTH_LONG).show();
+        //重置连接
+        Intent intent = new Intent(MainActivity.this, PrintActivity.class);
+        intent.setFlags(Intent.FLAG_ACTIVITY_FORWARD_RESULT);
+
+        intent.putExtra(CMD, "reConnect");
+        startService(intent);
     }
 
     @android.webkit.JavascriptInterface
-    public void actionFromJs() {
+    public void JsMoveToIndex(final String username, final String password) {
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                Toast.makeText(MainActivity.this, "js调用了Native函数", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "登录成功", Toast.LENGTH_SHORT).show();
+                userName = username;
+                userPassword = password;
+                saveSetting();//保存设置
+                showPage(0);//切换到首页
             }
         });
     }
@@ -435,6 +429,8 @@ public class MainActivity extends AppCompatActivity
             k_userText.setText(temp[3].replace(" ", ""));
             getSetting();
             userHash = ToastUtil.stringToMD5(userName + "llrj" + userPassword);
+        } else {
+            showPage(8);//登录界面
         }
     }
 
@@ -496,9 +492,13 @@ public class MainActivity extends AppCompatActivity
                 break;
             case 7://关于我们
                 page_web.setVisibility(View.VISIBLE);
-                //  mWebView.loadUrl("http://ms.n39.cn/dc/about.html" + url);
-                mWebView.loadUrl("file:///android_asset/index.html" + url);
+                mWebView.loadUrl("http://ms.n39.cn/dc/about.html" + url);
                 changeTitle(R.drawable.ic_about_white, "关于我们");
+                break;
+            case 8://登录界面
+                page_web.setVisibility(View.VISIBLE);
+                mWebView.loadUrl("http://ms.n39.cn/dc/login.html" + url);
+                changeTitle(R.drawable.ic_group_white, "登录点餐系统");
                 break;
         }
     }
@@ -533,7 +533,8 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_change) {
+            showPage(8);
             return true;
         }
 
