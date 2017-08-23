@@ -392,7 +392,30 @@ public class MainActivity extends AppCompatActivity
                 return true;
             }
         });
+        mWebView.addJavascriptInterface(this, "wx");
         showPage(0);
+    }
+
+    @android.webkit.JavascriptInterface
+    public void actionFromJs() {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MainActivity.this, "js调用了Native函数", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    @android.webkit.JavascriptInterface
+    public void actionFromJsWithParam(final String str) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Toast.makeText(MainActivity.this, "js调用了Native函数传递参数：" + str, Toast.LENGTH_SHORT).show();
+
+            }
+        });
+
     }
 
     public void getSetting() {//获取商家设置
@@ -473,7 +496,8 @@ public class MainActivity extends AppCompatActivity
                 break;
             case 7://关于我们
                 page_web.setVisibility(View.VISIBLE);
-                mWebView.loadUrl("http://ms.n39.cn/dc/about.html" + url);
+                //  mWebView.loadUrl("http://ms.n39.cn/dc/about.html" + url);
+                mWebView.loadUrl("file:///android_asset/index.html" + url);
                 changeTitle(R.drawable.ic_about_white, "关于我们");
                 break;
         }
