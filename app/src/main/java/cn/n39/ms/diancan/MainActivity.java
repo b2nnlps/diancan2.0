@@ -37,7 +37,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Set;
 
-import static android.webkit.WebSettings.LOAD_NO_CACHE;
+import static android.webkit.WebSettings.LOAD_DEFAULT;
 
 
 public class MainActivity extends AppCompatActivity
@@ -356,7 +356,7 @@ public class MainActivity extends AppCompatActivity
         mWebView.getSettings().setJavaScriptEnabled(true);
         mWebView.getSettings().setAllowFileAccess(true);
         mWebView.getSettings().setMediaPlaybackRequiresUserGesture(false);
-        mWebView.getSettings().setCacheMode(LOAD_NO_CACHE);
+        mWebView.getSettings().setCacheMode(LOAD_DEFAULT);
         mWebView.setWebViewClient(new WebViewClient() {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
