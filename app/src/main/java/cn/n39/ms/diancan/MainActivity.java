@@ -71,7 +71,6 @@ public class MainActivity extends AppCompatActivity
     private DeviceReceiver deviceReceiver;
     private ArrayList<String> boundName = new ArrayList<>();
     private ArrayList<String> unboundName = new ArrayList<>();
-    private ArrayList<String> connentName = new ArrayList<>();
     private MyBluetoothAdapter boundAdapter;
     private MyBluetoothAdapter unboundAdapter;
     private String defaultDevice = "";
@@ -83,7 +82,6 @@ public class MainActivity extends AppCompatActivity
     EditText k_userDeviceId, k_userName, k_userPassword, k_userText;
     Toolbar toolbar;
     private WebView mWebView;
-    public static PowerManager.WakeLock wakeLock, wakeLock2 = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,9 +94,8 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         instance = this;    //用于弹窗依赖和唤醒
-        acquireWakeLock(false);   //保持屏幕常亮
         checkUpdate();//检测更新
         initPage();
 
@@ -553,7 +550,6 @@ public class MainActivity extends AppCompatActivity
         super.onDestroy();
         try {
             unregisterReceiver(deviceReceiver);
-            releaseWakeLock();
         } catch (Exception e) {
 
         }
@@ -577,39 +573,6 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    //获取电源锁，保持该服务在屏幕熄灭时仍然获取CPU时，保持运行
-    public static void acquireWakeLock(boolean force) {
-        if (force) {
-            KeyguardManager km = (KeyguardManager) instance.getSystemService(Context.KEYGUARD_SERVICE);
-            KeyguardManager.KeyguardLock kl = km.newKeyguardLock("unLock");
-            //解锁
-            kl.disableKeyguard();
-            //获取电源管理器对象
-            PowerManager pm = (PowerManager) instance.getSystemService(Context.POWER_SERVICE);
-            //获取PowerManager.WakeLock对象,后面的参数|表示同时传入两个值,最后的是LogCat里用的Tag
-            PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.ACQUIRE_CAUSES_WAKEUP | PowerManager.SCREEN_DIM_WAKE_LOCK, "bright");
-            //点亮屏幕
-            wl.acquire();
-            //释放
-            wl.release();
-        } else {
-            if (null == wakeLock) {
-                PowerManager pm = (PowerManager) instance.getSystemService(Context.POWER_SERVICE);
-                wakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ON_AFTER_RELEASE, "PrintService");
-                if (wakeLock != null) {
-                    wakeLock.acquire();
-                }
-            }
-        }
-    }
-
-    //释放设备电源锁
-    private void releaseWakeLock() {
-        if (null != wakeLock) {
-            wakeLock.release();
-            wakeLock = null;
-        }
-    }
 
     public static Context getMyApplication() {
         return instance;
