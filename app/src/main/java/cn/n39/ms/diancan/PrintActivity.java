@@ -183,7 +183,7 @@ public class PrintActivity extends Service {
         BluetoothSocket printer;
         for (i = 0; i < printers.size(); i++) {
             printer = printers.get(i);
-            if (printer.isConnected()) {
+
                 try {
                     outputStream = printer.getOutputStream();
                     byte[] print_data = sendData.getBytes("gbk");
@@ -198,13 +198,13 @@ public class PrintActivity extends Service {
                     outputStream.flush();
                 } catch (IOException e) {
                     ToastUtil.showToast(PrintActivity.this, "发送失败！");
+                    ToastUtil.showToast(PrintActivity.this, "有设备掉线了，请检查连接！");
+                    printerCount--;
+                    showBarMess("已连接" + String.valueOf(printerCount) + "个打印机");
+                    isDisconnect();//更新打印机状态
                 }
-            } else {
-                ToastUtil.showToast(PrintActivity.this, "有设备掉线了，请检查连接！");
-                printerCount--;
-                showBarMess("已连接" + String.valueOf(printerCount) + "个打印机");
-                isDisconnect();//更新打印机状态
-            }
+
+
         }
     }
 
