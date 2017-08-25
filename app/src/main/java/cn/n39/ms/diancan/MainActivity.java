@@ -29,6 +29,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.FileInputStream;
@@ -99,7 +100,8 @@ public class MainActivity extends AppCompatActivity
         Set<BluetoothDevice> bluetoothDeviceSet = mBluetoothAdapter.getBondedDevices();
         for (BluetoothDevice device : bluetoothDeviceSet) {//搜索所有系统的蓝牙设备
             if (!bondDevicesList.contains(device)) bondDevicesList.add(device);
-            if (!defaultDevice.equals("") && device.getAddress().equals(defaultDevice)) {
+            if (device.getAddress().equals(defaultDevice)) {
+
             }
         }
         boundName.addAll(getData(bondDevicesList));
@@ -281,7 +283,10 @@ public class MainActivity extends AppCompatActivity
         int count = list.size();
         for (int i = 0; i < count; i++) {
             String deviceName = list.get(i).getName();
-            data.add(deviceName != null ? deviceName : list.get(i).getAddress());
+            String deviceAddress = list.get(i).getAddress();
+            deviceName = deviceName != null ? deviceName + "-" + deviceAddress : list.get(i).getAddress();
+            if (defaultDevice.equals(deviceAddress)) deviceName = "最近 " + deviceName;
+            data.add(deviceName);
         }
         return data;
     }
@@ -583,6 +588,7 @@ public class MainActivity extends AppCompatActivity
     private void defaultData() {//获取默认设备
         String fileName = "defaultDevice.ng"; //文件名字
         defaultDevice = readFile(fileName);
+        System.out.println("默认设备" + defaultDevice);
     }
 
     public void checkUpdate() {//检测更新，防卡

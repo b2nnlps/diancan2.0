@@ -128,11 +128,6 @@ public class PrintActivity extends Service {
 
     }
 
-    private void initView() {
-//        myName = device.getName() == null ? device.getAddress() : device.getName();
-        myAddress = device.getAddress();  //获取设备地址，保持这个玩意，下次直接连接
-    }
-
     /**
      * 连接蓝牙设备
      */
@@ -140,6 +135,7 @@ public class PrintActivity extends Service {
         try {
             bluetoothSocket = device.createRfcommSocketToServiceRecord(uuid);
             bluetoothSocket.connect();
+            print(bluetoothSocket);//打印连接成功
             printers.add(bluetoothSocket);//如果连接成功，加入打印机输出流列表
             bondDevicesList.add(device);//添加到已连接队列
             if (!bluetoothAdapter.isDiscovering()) {
@@ -156,6 +152,7 @@ public class PrintActivity extends Service {
 
     private void setConnectResult(boolean result) {
         if (result) {
+            myAddress = device.getAddress();
             writeFile("defaultDevice.ng", myAddress);
             ToastUtil.showToast(PrintActivity.this, "打印机连接成功！");
             printerCount++;
@@ -205,6 +202,26 @@ public class PrintActivity extends Service {
                 }
 
 
+        }
+    }
+
+
+    /**
+     * 连接打印成功
+     */
+    public void print(BluetoothSocket printer) {
+        try {
+            String sendData = "===打印机连接成功===\n\n\n\n\n\n";
+            outputStream = printer.getOutputStream();
+            byte[] print_data = sendData.getBytes("gbk");
+            outputStream.write(print_data, 0, print_data.length);
+            outputStream.flush();
+        } catch (IOException e) {
+            ToastUtil.showToast(PrintActivity.this, "发送失败！");
+            ToastUtil.showToast(PrintActivity.this, "有设备掉线了，请检查连接！");
+            printerCount--;
+            showBarMess("已连接" + String.valueOf(printerCount) + "个打印机");
+            isDisconnect();//更新打印机状态
         }
     }
 
